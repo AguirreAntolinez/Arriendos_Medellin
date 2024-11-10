@@ -22,4 +22,7 @@ download_data_consolidada<- function(n_chunk){
   }
 download_data_consolidada(n_chunk = 10)
 
+rentas_depurado<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/RENTAS%20OIME/rentas_depurado.csv",header = TRUE,sep = ";")
+
+#rentas_depurado_respaldo<-rentas_depurado
 #data_consolidada_respaldo<-data_consolidada
