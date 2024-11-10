@@ -1,4 +1,4 @@
-####AGREGACIÓN DE VARIABLES######
+####AGREGACIÓN DE VARIABLES ECV######
 
 #Author: William Alexander Aguirre Antolínez
 #Date: 10/11/2024
