@@ -30,4 +30,4 @@ rentas_comuna<-rentas_depurado %>%
     valor_m2=mean(valorm2),
     sd_valor_comercial = sd(valorm2, na.rm = TRUE)) 
 
-rentas_comuna %>%  group_by(medicion) %>% summarise(n(comunas))
+
