@@ -11,7 +11,7 @@
 
 #Modificar tipos de variables
 data_consolidada<-data_consolidada %>% 
-  mutate(factorExpPersonas=as.numeric(factorExpPersonas),
+  mutate(FEP_barrio=as.numeric(FEP_barrio),
          factorExpHogares=as.numeric(factorExpHogares),
          factorExpViviendas=as.numeric(factorExpViviendas),
         Edad=as.numeric(Edad),
@@ -31,20 +31,20 @@ Personas_medicion<-data_consolidada %>%
   group_by(medicion) %>% 
   summarise(
     Base_Personas=sum(base_personas),
-    Poblacion=sum(factorExpPersonas),
+    Poblacion=sum(FEP_barrio,na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
     
-    total_migrantes_internal = sum(vivia_en_otro_pais * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_internal = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
     
-    total_migrantes_intermun = sum(vivia_en_otro_municipio * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
     
-    total_migrantes_intraurb = sum(vivia_en_otro_barrio * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
     
-    total_viven_arriendo = sum(vive_arriendo * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion)
   )
 
