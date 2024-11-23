@@ -72,20 +72,20 @@ Personas_barrio<-data_consolidada %>%
   group_by(medicion,codigoBarrioComuna,nombreBarrio,skBarrio) %>% 
   summarise(
     Base_Personas=sum(base_personas),
-    Poblacion=sum(factorExpPersonas),
+    Poblacion=sum(FEP_barrio),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
-    total_migrantes_internal = sum(vivia_en_otro_pais * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_internal = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
     porcentaje_migrantes_internacionales =ifelse(porcentaje_migrantes_internacionales ==0,NA,porcentaje_migrantes_internacionales),
     
-    total_migrantes_intermun = sum(vivia_en_otro_municipio * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
     porcentaje_migrantes_intermun =ifelse(porcentaje_migrantes_intermun ==0,NA,porcentaje_migrantes_intermun),
-    total_migrantes_intraurb = sum(vivia_en_otro_barrio * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
     
-    total_viven_arriendo = sum(vive_arriendo * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion),
     porcentaje_viven_arriendo = ifelse(porcentaje_viven_arriendo==0,NA,porcentaje_viven_arriendo),
     
@@ -101,7 +101,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
 
 
 Hogares_barrio<-data_consolidada %>% filter(!is.na(skBarrio) & !is.na(valor_arriendo)  ) %>% 
-  select(skBarrio,skHogar,valor_arriendo,factorExpHogares) %>% 
+  select(skBarrio,skHogar,valor_arriendo,FEP_barrio) %>% 
   distinct() %>% 
   group_by(skBarrio) %>% 
   summarise(Hogares=sum(factorExpHogares),
@@ -118,20 +118,20 @@ Personas_comuna<-data_consolidada %>%
   group_by(medicion,Cod_comuna,nombreComuna) %>% 
   summarise(
     Base_Personas=sum(base_personas),
-    Poblacion=sum(factorExpPersonas),
+    Poblacion=sum(FEP_barrio),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
-    total_migrantes_internal = sum(vivia_en_otro_pais * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_internal = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
     porcentaje_migrantes_internacionales =ifelse(porcentaje_migrantes_internacionales ==0,NA,porcentaje_migrantes_internacionales),
     
-    total_migrantes_intermun = sum(vivia_en_otro_municipio * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
     porcentaje_migrantes_intermun =ifelse(porcentaje_migrantes_intermun ==0,NA,porcentaje_migrantes_intermun),
-    total_migrantes_intraurb = sum(vivia_en_otro_barrio * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
     
-    total_viven_arriendo = sum(vive_arriendo * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
+    total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
     porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion),
     porcentaje_viven_arriendo = ifelse(porcentaje_viven_arriendo==0,NA,porcentaje_viven_arriendo),
     
@@ -166,7 +166,7 @@ vida_en_barrio <- data_consolidada %>%
   summarize(
     vida_en_barrio_promedio =
       weighted.mean(vida_en_barrio,
-                    factorExpPersonas,
+                    FEP_barrio,
                     na.rm = TRUE)
   )
 
@@ -174,8 +174,8 @@ vivia_en_otro_pais <- data_consolidada %>%
   filter(zona=="U") %>% 
   group_by(medicion) %>%
   summarize(
-    total_migrantes = sum(vivia_en_otro_pais * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
-    total_personas = sum(factorExpPersonas, na.rm = TRUE),               # Total de personas ponderado
+    total_migrantes = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
+    total_personas = sum(FEP_barrio, na.rm = TRUE),               # Total de personas ponderado
     porcentaje_migrantes_internacionales = (total_migrantes / total_personas) 
   )
 
@@ -183,8 +183,8 @@ vivia_en_otro_municipio <- data_consolidada %>%
   filter(zona=="U") %>% 
   group_by(medicion) %>%
   summarize(
-    total_migrantes = sum(vivia_en_otro_municipio * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
-    total_personas = sum(factorExpPersonas, na.rm = TRUE),               # Total de personas ponderado
+    total_migrantes = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
+    total_personas = sum(FEP_barrio, na.rm = TRUE),               # Total de personas ponderado
     porcentaje_migrantes_interregionales = (total_migrantes / total_personas) 
   )
 
@@ -192,8 +192,8 @@ vivia_en_otro_barrio <- data_consolidada %>%
   filter(zona=="U") %>% 
   group_by(medicion) %>%
   summarize(
-    total_migrantes = sum(vivia_en_otro_barrio * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
-    total_personas = sum(factorExpPersonas, na.rm = TRUE),               # Total de personas ponderado
+    total_migrantes = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
+    total_personas = sum(FEP_barrio, na.rm = TRUE),               # Total de personas ponderado
     porcentaje_migrantes_intraurbanos = (total_migrantes / total_personas) 
   )
 
@@ -202,8 +202,8 @@ vive_en_arriendo <- data_consolidada %>%
   filter(zona=="U") %>% 
   group_by(medicion) %>%
   summarize(
-    total_en_arriendo = sum(vive_arriendo * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
-    total_personas = sum(factorExpPersonas, na.rm = TRUE),               # Total de personas ponderado
+    total_en_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
+    total_personas = sum(FEP_barrio, na.rm = TRUE),               # Total de personas ponderado
     porcentaje_en_arriendo = (total_en_arriendo / total_personas) 
   )
 
@@ -215,8 +215,8 @@ migrante_en_arriendo<-data_consolidada %>%
   filter(zona=="U") %>% 
   group_by(medicion) %>%
   summarize(
-    total_migrante_en_arriendo = sum(migrante_en_arriendo * factorExpPersonas, na.rm = TRUE),   # Peso de migrantes
-    total_personas = sum(factorExpPersonas, na.rm = TRUE),               # Total de personas ponderado
+    total_migrante_en_arriendo = sum(migrante_en_arriendo * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
+    total_personas = sum(FEP_barrio, na.rm = TRUE),               # Total de personas ponderado
     porcentaje_en_arriendo = (total_migrante_en_arriendo / total_personas) 
   )
 
