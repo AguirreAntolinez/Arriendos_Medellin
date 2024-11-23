@@ -118,7 +118,7 @@ Personas_comuna<-data_consolidada %>%
   group_by(medicion,Cod_comuna,nombreComuna) %>% 
   summarise(
     Base_Personas=sum(base_personas),
-    Poblacion=sum(FEP_barrio),
+    Poblacion=sum(FEP_barrio, na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
     total_migrantes_internal = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),   # Peso de migrantes
