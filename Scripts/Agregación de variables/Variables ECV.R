@@ -101,7 +101,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
 
 
 Hogares_barrio<-data_consolidada %>% filter(!is.na(skBarrio) & !is.na(valor_arriendo)  ) %>% 
-  select(skBarrio,skHogar,valor_arriendo,FEP_barrio) %>% 
+  select(skBarrio,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
   distinct() %>% 
   group_by(skBarrio) %>% 
   summarise(Hogares=sum(factorExpHogares),
