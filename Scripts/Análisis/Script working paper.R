@@ -1,5 +1,8 @@
-
-#DEBO REVISAR LOS NA DESDE EL INICIO DE LA CARGA PARA VER QUE SE ESTÉ ASIGNANDO BIEN EL FEP PORQUE NO PARECE
+#WORKING PAPER ECONOMETRIA ESPACIAL
+#Author: William Alexander Aguirre Antolínez
+#Date 1-12-2024
+#Description: this scrpit contains spatial analysis of the migration effect
+#on housing rents in neighborhoods of Medellín.  
 
 #Cargar paquetes
 Paquetes<-c("spdep","Ecdat","plm","spatialreg","splm","tidyverse","sf")
