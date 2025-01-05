@@ -47,7 +47,7 @@ data_consolidada<-data_consolidada %>%
 
 Personas_barrio<-data_consolidada %>% 
   mutate(base_personas=1) %>%   
-  group_by(medicion,codigoBarrioComuna,nombreBarrio,skBarrio) %>% 
+  group_by(medicion,codigoBarrioComuna,nombreBarrio) %>% 
   summarise(
     Base_Personas=sum(base_personas),
     Poblacion=sum(FEP_barrio),
@@ -80,7 +80,7 @@ calcular_moda <- function(x) {
 }
 
 Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>% 
-  select(skBarrio,
+  select(codigoBarrioComuna,
          skVivienda,
          factorExpViviendas,
          Estrato,
@@ -101,7 +101,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
          material_vivienda
          ) %>% 
   distinct() %>% 
-  group_by(skBarrio) %>% 
+  group_by(codigoBarrioComuna) %>% 
   summarise(Viviendas=sum(factorExpViviendas),
             
             Estrato_predominante=calcular_moda(Estrato),
@@ -147,15 +147,15 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
             )
 
 
-Hogares_barrio<-data_consolidada %>% filter(!is.na(skBarrio) & !is.na(valor_arriendo)  ) %>% 
-  select(skBarrio,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
+Hogares_barrio<-data_consolidada %>% filter(!is.na(codigoBarrioComuna) & !is.na(valor_arriendo)  ) %>% 
+  select(codigoBarrioComuna,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
   distinct() %>% 
-  group_by(skBarrio) %>% 
+  group_by(codigoBarrioComuna) %>% 
   summarise(Hogares=sum(factorExpHogares),
             media_arriendo=mean(valor_arriendo,na.rm=TRUE),
             log_arriendo=log(media_arriendo)
             )
 
 data_barrios<-Personas_barrio %>% 
-  left_join(Viviendas_barrio,by="skBarrio") %>%   
-  left_join(Hogares_barrio,by="skBarrio")
+  left_join(Viviendas_barrio,by="codigoBarrioComuna") %>%   
+  left_join(Hogares_barrio,by="codigoBarrioComuna")
