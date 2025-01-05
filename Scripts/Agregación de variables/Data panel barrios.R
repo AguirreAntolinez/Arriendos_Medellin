@@ -39,7 +39,7 @@ data_consolidada<-data_consolidada %>%
          paredes_material=as.numeric(paredes_material),
          pisos_material=as.numeric(pisos_material),
          servicios=as.numeric(servicios),
-         material_vivienda=ifelse(as.numeric(material_vivienda)<2,0,1)
+         material_vivienda=as.numeric(material_vivienda)
          )
          
   
