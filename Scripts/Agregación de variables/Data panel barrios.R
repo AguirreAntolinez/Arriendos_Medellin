@@ -120,7 +120,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
             
             servicios=mean(servicios, na.rm=TRUE),
             
-            material_vivienda=sum(material_vivienda<2)
+            material_vivienda=sum(material_vivienda<2),
             por_material_vivienda=material_vivienda/Viviendas
             )
 
