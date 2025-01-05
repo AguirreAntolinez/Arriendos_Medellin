@@ -22,7 +22,23 @@ data_consolidada<-data_consolidada %>%
         vivia_en_otro_pais=as.numeric(vivia_en_otro_pais),
         vivia_en_otro_municipio=as.numeric(vivia_en_otro_municipio),
         vivia_en_otro_barrio=as.numeric(vivia_en_otro_barrio),
-        migrante_en_arriendo=as.numeric(migrante_en_arriendo)
+        migrante_en_arriendo=as.numeric(migrante_en_arriendo),
+        Estrato=as.numeric(Estrato),
+        posee_gas=as.numeric(posee_gas),
+        posee_aseo=as.numeric(posee_aseo),
+        total_cuartos=as.numeric(total_cuartos),
+        cuartos_dormir=as.numeric(cuartos_dormir),
+        posee_sanitario=as.numeric(posee_sanitario),
+        cantidad_personas_hogar=as.numeric(cantidad_personas_hogar),
+        personas_cuarto=as.numeric(personas_cuarto),
+        hacinamiento=as.numeric(hacinamiento),
+        posee_energia=as.numeric(posee_energia),
+        posee_acueducto=as.numeric(posee_acueducto),
+        posee_alcantarillado=as.numeric(posee_alcantarillado),
+        paredes_material=as.numeric(paredes_material),
+        pisos_material=as.numeric(pisos_material),
+        servicios=as.numeric(servicios),
+        material_vivienda=as.numeric(material_vivienda)
         )
 
 #Por medición
