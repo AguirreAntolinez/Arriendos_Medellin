@@ -77,7 +77,25 @@ calcular_moda <- function(x) {
 }
 
 Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>% 
-  select(skBarrio,skVivienda,factorExpViviendas) %>% 
+  select(skBarrio,
+         skVivienda,
+         factorExpViviendas,
+         Estrato,
+         posee_gas,
+         posee_aseo,
+         posee_sanitario,
+         posee_energia,
+         posee_acueducto,
+         posee_alcantarillado,
+         total_cuartos,
+         cantidad_personas_hogar,
+         personas_cuarto,
+         hacinamiento,
+         paredes_material,
+         pisos_material,
+         servicios,
+         material_vivienda
+         ) %>% 
   distinct() %>% 
   group_by(skBarrio) %>% 
   summarise(Viviendas=sum(factorExpViviendas),
