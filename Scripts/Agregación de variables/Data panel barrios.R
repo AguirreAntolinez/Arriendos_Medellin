@@ -90,6 +90,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
          total_cuartos,
          cantidad_personas_hogar,
          personas_cuarto,
+         cuartos_dormir,
          hacinamiento,
          paredes_material,
          pisos_material,
