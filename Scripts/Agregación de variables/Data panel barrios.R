@@ -41,7 +41,7 @@ data_consolidada<-data_consolidada %>%
          material_vivienda=as.numeric(material_vivienda)
   )
 
-#REVISAR HACIA ABAJO
+
 Personas_barrio<-data_consolidada %>% 
   mutate(base_personas=1) %>%   
   group_by(medicion,codigoBarrioComuna,nombreBarrio,skBarrio) %>% 
