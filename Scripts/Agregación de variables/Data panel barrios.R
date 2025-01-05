@@ -31,6 +31,7 @@ data_consolidada<-data_consolidada %>%
          posee_sanitario=as.numeric(posee_sanitario),
          cantidad_personas_hogar=as.numeric(cantidad_personas_hogar),
          personas_cuarto=as.numeric(personas_cuarto),
+         personas_cuarto=ifelse(is.infinite(personas_cuarto),cantidad_personas_hogar,personas_cuarto),
          hacinamiento=as.numeric(hacinamiento),
          posee_energia=as.numeric(posee_energia),
          posee_acueducto=as.numeric(posee_acueducto),
@@ -38,8 +39,10 @@ data_consolidada<-data_consolidada %>%
          paredes_material=as.numeric(paredes_material),
          pisos_material=as.numeric(pisos_material),
          servicios=as.numeric(servicios),
-         material_vivienda=as.numeric(material_vivienda)
-  )
+         material_vivienda=ifelse(as.numeric(material_vivienda)<2,0,1)
+         )
+         
+  
 
 
 Personas_barrio<-data_consolidada %>% 
@@ -104,22 +107,22 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
             Estrato_predominante=calcular_moda(Estrato),
             Estrato_promedio=mean(Estrato,na.rm=TRUE),
             
-            posee_gas=sum(posee_gas),
+            posee_gas=sum(posee_gas*factorExpViviendas),
             por_posee_gas=posee_gas/Viviendas,
               
-            posee_aseo=sum(posee_aseo),
+            posee_aseo=sum(posee_aseo*factorExpViviendas),
             por_posee_aseo=posee_aseo/Viviendas,
             
-            posee_sanitario=sum(posee_sanitario),
+            posee_sanitario=sum(posee_sanitario*factorExpViviendas),
             por_posee_sanitario=posee_sanitario/Viviendas,
             
-            posee_energia=sum(posee_energia),
+            posee_energia=sum(posee_energia*factorExpViviendas),
             por_posee_energia=posee_energia/Viviendas,
             
-            posee_acueducto=sum(posee_acueducto),
+            posee_acueducto=sum(posee_acueducto*factorExpViviendas),
             por_posee_acueducto=posee_acueducto/Viviendas,
             
-            posee_alcantarillado=sum(posee_alcantarillado),
+            posee_alcantarillado=sum(posee_alcantarillado*factorExpViviendas),
             por_posee_alcantarillado=posee_alcantarillado/Viviendas,
             
             total_cuartos=mean(total_cuartos, na.rm=TRUE),
@@ -128,18 +131,18 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
             cantidad_personas_hogar=mean(cantidad_personas_hogar,na.rm=TRUE),
             personas_cuarto=mean(personas_cuarto,na.rm=TRUE),
             
-            hacinamiento=sum(hacinamiento),
+            hacinamiento=sum(hacinamiento*factorExpViviendas),
             por_hacinamiento=hacinamiento/Viviendas,
             
-            paredes_material=sum(paredes_material),
+            paredes_material=sum(paredes_material*factorExpViviendas),
             por_paredes_material=paredes_material/Viviendas,
             
-            pisos_material=sum(pisos_material),
+            pisos_material=sum(pisos_material*factorExpViviendas),
             por_pisos_material=pisos_material/Viviendas,
             
             servicios=mean(servicios, na.rm=TRUE),
             
-            material_vivienda=sum(material_vivienda<2),
+            material_vivienda=sum(material_vivienda*factorExpViviendas),
             por_material_vivienda=material_vivienda/Viviendas
             )
 
