@@ -41,7 +41,8 @@ data_consolidada<-data_consolidada %>%
       Edad >= 65 & Edad <=69 ~ 14,
       Edad >= 70 & Edad <=74 ~ 15,
       Edad >= 75 & Edad <=79 ~ 16,
-      Edad >= 80  ~ 17),
+      Edad >= 80  ~ 17
+      , .default = NA),
     GrupoEdad2=case_when(
       GrupoEdad==1 | GrupoEdad==2 | GrupoEdad==3 ~ 1,
       GrupoEdad==4 | GrupoEdad==5 ~ 2,
@@ -49,11 +50,14 @@ data_consolidada<-data_consolidada %>%
       GrupoEdad==8 | GrupoEdad==9 ~ 4,
       GrupoEdad==10 | GrupoEdad==11 ~ 5,
       GrupoEdad==12 | GrupoEdad==13 ~ 6,
-      GrupoEdad==14 | GrupoEdad==15 | GrupoEdad==16  | GrupoEdad==17 ~ 7),
+      GrupoEdad==14 | GrupoEdad==15 | GrupoEdad==16  | GrupoEdad==17 ~ 7
+      , .default = NA),
     key=paste0(codigoBarrioComuna,"_",Sexo,"_",GrupoEdad2,"_",medicion)
     ) %>%
   inner_join(factor_expansion, by = "key")
   
+
+
 
 rentas_depurado<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/RENTAS%20OIME/rentas_depurado.csv",header = TRUE,sep = ";")
 
