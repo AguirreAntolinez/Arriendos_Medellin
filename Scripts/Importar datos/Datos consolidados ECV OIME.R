@@ -52,7 +52,8 @@ data_consolidada<-data_consolidada %>%
       GrupoEdad==14 | GrupoEdad==15 | GrupoEdad==16  | GrupoEdad==17 ~ 7),
     key=paste0(codigoBarrioComuna,"_",Sexo,"_",GrupoEdad2,"_",medicion)
     ) %>%
-  left_join(factor_expansion, by = "key")
+  inner_join(factor_expansion, by = "key")
+  
 
 rentas_depurado<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/RENTAS%20OIME/rentas_depurado.csv",header = TRUE,sep = ";")
 
