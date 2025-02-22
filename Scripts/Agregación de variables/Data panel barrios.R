@@ -83,6 +83,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
   select(codigoBarrioComuna,
          skVivienda,
          factorExpViviendas,
+         medicion,
          Estrato,
          posee_gas,
          posee_aseo,
@@ -101,7 +102,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
          material_vivienda
          ) %>% 
   distinct() %>% 
-  group_by(codigoBarrioComuna) %>% 
+  group_by(codigoBarrioComuna,medicion) %>% 
   summarise(Viviendas=sum(factorExpViviendas),
             
             Estrato_predominante=calcular_moda(Estrato),
@@ -145,17 +146,43 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
             material_vivienda=sum(material_vivienda*factorExpViviendas),
             por_material_vivienda=material_vivienda/Viviendas
             )
+  
 
 
 Hogares_barrio<-data_consolidada %>% filter(!is.na(codigoBarrioComuna) & !is.na(valor_arriendo)  ) %>% 
-  select(codigoBarrioComuna,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
+  select(codigoBarrioComuna,medicion,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
   distinct() %>% 
-  group_by(codigoBarrioComuna) %>% 
+  group_by(codigoBarrioComuna,medicion) %>% 
   summarise(Hogares=sum(factorExpHogares),
             media_arriendo=mean(valor_arriendo,na.rm=TRUE),
             log_arriendo=log(media_arriendo)
-            )
+            ) 
+  
 
+
+
+viviendas<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ESTADISTICAS%20CATASTRALES/Viviendas.csv")
+
+viviendas<-viviendas %>% 
+  mutate(across(starts_with("X"),as.numeric)) %>% 
+  pivot_longer(cols = starts_with("X"),
+               names_to = "medicion",
+               values_to = "viviendas") %>% 
+  mutate(medicion=as.character(sub("X","",medicion)),
+         codigoBarrioComuna=as.character(codigoBarrioComuna)) %>% 
+  select(codigoBarrioComuna,medicion,viviendas)
+
+
+#Consolidar el panel de barrios
 data_barrios<-Personas_barrio %>% 
-  left_join(Viviendas_barrio,by="codigoBarrioComuna") %>%   
-  left_join(Hogares_barrio,by="codigoBarrioComuna")
+  left_join(Viviendas_barrio,by=c("codigoBarrioComuna","medicion")) %>%   
+  left_join(Hogares_barrio,by=c("codigoBarrioComuna","medicion")) %>%   
+  left_join(viviendas,by=c("codigoBarrioComuna","medicion"))
+
+#Aqui se rellenan mientras tantos los NA con la cantidad de viviendas de 2014
+data_barrios <- data_barrios %>% 
+  group_by(codigoBarrioComuna) %>%  
+  mutate(viviendas = ifelse(is.na(viviendas), viviendas[medicion == 2014], viviendas)) %>%
+  ungroup()  
+
+
