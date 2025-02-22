@@ -56,19 +56,19 @@ Personas_barrio<-data_consolidada %>%
     
     total_migrantes_internal = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),
     porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
-    porcentaje_migrantes_internacionales =ifelse(porcentaje_migrantes_internacionales ==0,NA,porcentaje_migrantes_internacionales),
+    #porcentaje_migrantes_internacionales =ifelse(porcentaje_migrantes_internacionales ==0,NA,porcentaje_migrantes_internacionales),
     
     total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),   
     porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
-    porcentaje_migrantes_intermun =ifelse(porcentaje_migrantes_intermun ==0,NA,porcentaje_migrantes_intermun),
+    #porcentaje_migrantes_intermun =ifelse(porcentaje_migrantes_intermun ==0,NA,porcentaje_migrantes_intermun),
     
     total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),  
     porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
-    porcentaje_migrantes_intraurb =ifelse(porcentaje_migrantes_intraurb ==0,NA,porcentaje_migrantes_intraurb),
+    #porcentaje_migrantes_intraurb =ifelse(porcentaje_migrantes_intraurb ==0,NA,porcentaje_migrantes_intraurb),
     
     total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),   
     porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion),
-    porcentaje_viven_arriendo = ifelse(porcentaje_viven_arriendo==0,NA,porcentaje_viven_arriendo),
+    #porcentaje_viven_arriendo = ifelse(porcentaje_viven_arriendo==0,NA,porcentaje_viven_arriendo),
     
     )
 
@@ -184,5 +184,44 @@ data_barrios <- data_barrios %>%
   group_by(codigoBarrioComuna) %>%  
   mutate(viviendas = ifelse(is.na(viviendas), viviendas[medicion == 2014], viviendas)) %>%
   ungroup()  
+
+
+#Calcular las tasas de variacion
+
+data_barrios <- data_barrios %>%
+  arrange(codigoBarrioComuna, medicion) %>%  # Asegurar que los datos estén ordenados
+  group_by(codigoBarrioComuna) %>%  # Agrupar por barrio
+  mutate(
+    viviendas_lag=lag(viviendas),
+    var_viviendas = case_when(
+      viviendas_lag==0~100,
+      is.na(viviendas_lag)~NA,
+      TRUE~ (viviendas - viviendas_lag) / viviendas_lag * 100),
+    
+    poblacion_lag=lag(Poblacion),
+    var_poblacion = case_when(
+      poblacion_lag==0~100,
+      is.na(poblacion_lag)~NA,
+      TRUE~ (Poblacion - poblacion_lag) / poblacion_lag * 100),
+    
+    migrante_internal_lag=lag(total_migrantes_internal),
+    var_migrante_internal = case_when(
+      migrante_internal_lag==0~100,
+      is.na(migrante_internal_lag)~NA,
+      TRUE~ (total_migrantes_internal - migrante_internal_lag) / migrante_internal_lag * 100),
+    
+    migrante_intermun_lag=lag(total_migrantes_intermun),
+    var_migrante_intermun = case_when(
+      migrante_intermun_lag==0~100,
+      is.na(migrante_intermun_lag)~NA,
+      TRUE~ (total_migrantes_intermun - migrante_intermun_lag) / migrante_intermun_lag * 100),
+    
+    migrante_intraurb_lag=lag(total_migrantes_intraurb),
+    var_migrante_intraurb = case_when(
+      migrante_intraurb_lag==0~100,
+      is.na(migrante_intraurb_lag)~NA,
+      TRUE~ (total_migrantes_intraurb - migrante_intraurb_lag) / migrante_intraurb_lag * 100)) %>% 
+    
+  ungroup() 
 
 
