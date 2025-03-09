@@ -56,19 +56,15 @@ Personas_barrio<-data_consolidada %>%
     
     total_migrantes_internal = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),
     porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
-    #porcentaje_migrantes_internacionales =ifelse(porcentaje_migrantes_internacionales ==0,NA,porcentaje_migrantes_internacionales),
     
     total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),   
     porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
-    #porcentaje_migrantes_intermun =ifelse(porcentaje_migrantes_intermun ==0,NA,porcentaje_migrantes_intermun),
     
     total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),  
     porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
-    #porcentaje_migrantes_intraurb =ifelse(porcentaje_migrantes_intraurb ==0,NA,porcentaje_migrantes_intraurb),
     
     total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),   
     porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion),
-    #porcentaje_viven_arriendo = ifelse(porcentaje_viven_arriendo==0,NA,porcentaje_viven_arriendo),
     
     )
 
@@ -105,8 +101,11 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
   group_by(codigoBarrioComuna,medicion) %>% 
   summarise(Viviendas=sum(factorExpViviendas),
             
-            Estrato_predominante=calcular_moda(Estrato),
             Estrato_promedio=mean(Estrato,na.rm=TRUE),
+            
+            Estrato_alto=ifelse(round(Estrato_promedio)>4,1,0),
+            
+            Estrato_medio=ifelse(round(Estrato_promedio)>2 & round(Estrato_promedio)<5 ,1,0),
             
             posee_gas=sum(posee_gas*factorExpViviendas),
             por_posee_gas=posee_gas/Viviendas,
