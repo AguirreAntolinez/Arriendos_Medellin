@@ -9,6 +9,32 @@
 
 ##Para detalles y comentarios: alexander.aguirre@udea.edu.co
 
+#Excluir los corregimientos
+comunas<-c('1','2','3','4',
+           '5','6','7','8',
+           '9','10','11','12',
+           '13','14','15','16')
+
+mediciones<-c('2008','2009','2010',
+              '2011','2012','2013',
+              '2014','2015','2016',
+              '2017','2018','2019')
+
+barrios_sin_arrendamiento<-c('1008','108','1103','1401','1408',
+                             '1414','1416','1418','1419','1420',
+                             '1502','1604','1618','1621','314',
+                             '315','517','612','702','705',
+                             '725','805','915','916','917')
+
+data_consolidada<-data_consolidada %>% filter(
+  zona=='U' & 
+    Cod_comuna %in% comunas & 
+    medicion %in% mediciones &
+    !codigoBarrioComuna %in% barrios_sin_arrendamiento)
+
+
+
+
 #Modificar tipos de variables
 data_consolidada<-data_consolidada %>% 
   mutate(FEP_barrio=as.numeric(FEP_barrio),
@@ -147,18 +173,21 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
             )
   
 
+ipc<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/IPC/IPC.csv")
+ipc<-ipc %>% rename(medicion=Año) %>% select(medicion,Indice) %>% mutate(medicion=as.character(medicion))
 
 Hogares_barrio<-data_consolidada %>% filter(!is.na(codigoBarrioComuna) & !is.na(valor_arriendo)  ) %>% 
   select(codigoBarrioComuna,medicion,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
   distinct() %>% 
   group_by(codigoBarrioComuna,medicion) %>% 
   summarise(Hogares=sum(factorExpHogares),
-            media_arriendo=mean(valor_arriendo,na.rm=TRUE),
-            log_arriendo=log(media_arriendo)
-            ) 
+            media_arriendo=mean(valor_arriendo,na.rm=TRUE)
+            ) %>% 
+  inner_join(ipc, by="medicion") %>% 
+  mutate(
+         media_arriendo_real=(media_arriendo/Indice)*100,
+         log_arriendo=log(media_arriendo_real))
   
-
-
 
 viviendas<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ESTADISTICAS%20CATASTRALES/Viviendas.csv")
 
@@ -184,9 +213,9 @@ data_barrios <- data_barrios %>%
   mutate(viviendas = ifelse(is.na(viviendas), viviendas[medicion == 2014], viviendas)) %>%
   ungroup()  
 
+faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComuna","medicion"))
 
 #Calcular las tasas de variacion
-
 data_barrios <- data_barrios %>%
   arrange(codigoBarrioComuna, medicion) %>%  # Asegurar que los datos estén ordenados
   group_by(codigoBarrioComuna) %>%  # Agrupar por barrio
@@ -222,5 +251,6 @@ data_barrios <- data_barrios %>%
       TRUE~ (total_migrantes_intraurb - migrante_intraurb_lag) / migrante_intraurb_lag * 100)) %>% 
     
   ungroup() 
+
 
 
