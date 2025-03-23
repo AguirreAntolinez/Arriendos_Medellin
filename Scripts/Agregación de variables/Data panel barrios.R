@@ -20,17 +20,18 @@ mediciones<-c('2008','2009','2010',
               '2014','2015','2016',
               '2017','2018','2019')
 
-barrios_sin_arrendamiento<-c('1008','108','1103','1401','1408',
-                             '1414','1416','1418','1419','1420',
-                             '1502','1604','1618','1621','314',
-                             '315','517','612','702','705',
-                             '725','805','915','916','917')
+# barrios_sin_arrendamiento<-c('1008','108','1103','1401','1408',
+#                              '1414','1416','1418','1419','1420',
+#                              '1502','1604','1618','1621','314',
+#                              '315','517','612','702','705',
+#                              '725','805','915','916','917')
 
 data_consolidada<-data_consolidada %>% filter(
   zona=='U' & 
     Cod_comuna %in% comunas & 
-    medicion %in% mediciones &
-    !codigoBarrioComuna %in% barrios_sin_arrendamiento)
+    medicion %in% mediciones #&
+    #!codigoBarrioComuna %in% barrios_sin_arrendamiento
+    )
 
 
 
