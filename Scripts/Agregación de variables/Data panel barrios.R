@@ -74,7 +74,7 @@ data_consolidada<-data_consolidada %>%
 
 Personas_barrio<-data_consolidada %>% 
   mutate(base_personas=1) %>%   
-  group_by(medicion,codigoBarrioComuna,nombreBarrio) %>% 
+  group_by(medicion,codigoBarrioComunaUnificado,nombreBarrioUnificado) %>% 
   summarise(
     Base_Personas=sum(base_personas),
     Poblacion=sum(FEP_barrio),
@@ -103,7 +103,7 @@ calcular_moda <- function(x) {
 }
 
 Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>% 
-  select(codigoBarrioComuna,
+  select(codigoBarrioComunaUnificado,
          skVivienda,
          factorExpViviendas,
          medicion,
@@ -125,7 +125,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
          material_vivienda
          ) %>% 
   distinct() %>% 
-  group_by(codigoBarrioComuna,medicion) %>% 
+  group_by(codigoBarrioComunaUnificado,medicion) %>% 
   summarise(Viviendas=sum(factorExpViviendas),
             
             Estrato_promedio=mean(Estrato,na.rm=TRUE),
@@ -177,10 +177,10 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
 ipc<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/IPC/IPC.csv")
 ipc<-ipc %>% rename(medicion=Año) %>% select(medicion,Indice) %>% mutate(medicion=as.character(medicion))
 
-Hogares_barrio<-data_consolidada %>% filter(!is.na(codigoBarrioComuna) & !is.na(valor_arriendo)  ) %>% 
-  select(codigoBarrioComuna,medicion,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
+Hogares_barrio<-data_consolidada %>% filter(!is.na(codigoBarrioComunaUnificado) & !is.na(valor_arriendo)  ) %>% 
+  select(codigoBarrioComunaUnificado,medicion,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
   distinct() %>% 
-  group_by(codigoBarrioComuna,medicion) %>% 
+  group_by(codigoBarrioComunaUnificado,medicion) %>% 
   summarise(Hogares=sum(factorExpHogares),
             media_arriendo=mean(valor_arriendo,na.rm=TRUE)
             ) %>% 
@@ -199,27 +199,40 @@ viviendas<-viviendas %>%
                values_to = "viviendas") %>% 
   mutate(medicion=as.character(sub("X","",medicion)),
          codigoBarrioComuna=as.character(codigoBarrioComuna)) %>% 
-  select(codigoBarrioComuna,medicion,viviendas)
+  select(codigoBarrioComuna,medicion,viviendas) %>% 
+  mutate(
+    codigoBarrioComunaUnificado=case_when(
+      codigoBarrioComuna=="315" ~ "314",
+      codigoBarrioComuna=="915" ~ "914",
+      codigoBarrioComuna=="916" ~ "914",
+      .default = codigoBarrioComuna
+    ),
+    nombreBarrioUnificado=case_when(
+      codigoBarrioComunaUnificado=="314"~ "San José la Cima",
+      codigoBarrioComunaUnificado=="914"~ "Asomadera",
+      .default = nombreBarrio
+    )
+  )
 
 
 #Consolidar el panel de barrios
 data_barrios<-Personas_barrio %>% 
-  left_join(Viviendas_barrio,by=c("codigoBarrioComuna","medicion")) %>%   
-  left_join(Hogares_barrio,by=c("codigoBarrioComuna","medicion")) %>%   
-  left_join(viviendas,by=c("codigoBarrioComuna","medicion"))
+  left_join(Viviendas_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
+  left_join(Hogares_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
+  left_join(viviendas,by=c("codigoBarrioComunaUnificado","medicion"))
 
 #Aqui se rellenan mientras tantos los NA con la cantidad de viviendas de 2014
 data_barrios <- data_barrios %>% 
-  group_by(codigoBarrioComuna) %>%  
+  group_by(codigoBarrioComunaUnificado) %>%  
   mutate(viviendas = ifelse(is.na(viviendas), viviendas[medicion == 2014], viviendas)) %>%
   ungroup()  
 
-faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComuna","medicion"))
+faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComunaUnificado","medicion"))
 
 #Calcular las tasas de variacion
 data_barrios <- data_barrios %>%
-  arrange(codigoBarrioComuna, medicion) %>%  # Asegurar que los datos estén ordenados
-  group_by(codigoBarrioComuna) %>%  # Agrupar por barrio
+  arrange(codigoBarrioComunaUnificado, medicion) %>%  # Asegurar que los datos estén ordenados
+  group_by(codigoBarrioComunaUnificado) %>%  # Agrupar por barrio
   mutate(
     viviendas_lag=lag(viviendas),
     var_viviendas = case_when(
