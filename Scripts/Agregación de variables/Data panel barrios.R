@@ -206,7 +206,7 @@ viviendas<-viviendas %>%
       codigoBarrioComuna=="916" ~ "914",
       .default = codigoBarrioComuna
     )
-  )
+  ) %>% select(codigoBarrioComunaUnificado,medicion,viviendas)
 
 
 #Consolidar el panel de barrios
