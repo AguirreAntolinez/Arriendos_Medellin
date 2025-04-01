@@ -206,7 +206,11 @@ viviendas<-viviendas %>%
       codigoBarrioComuna=="916" ~ "914",
       .default = codigoBarrioComuna
     )
-  ) %>% select(codigoBarrioComunaUnificado,medicion,viviendas)
+  ) %>% 
+  select(codigoBarrioComunaUnificado,medicion,viviendas) %>% 
+  group_by(codigoBarrioComunaUnificado,medicion) %>% 
+  summarise(viviendas=sum(viviendas,na.rm = TRUE)) 
+  
 
 
 #Consolidar el panel de barrios
