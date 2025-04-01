@@ -206,11 +206,6 @@ viviendas<-viviendas %>%
       codigoBarrioComuna=="915" ~ "914",
       codigoBarrioComuna=="916" ~ "914",
       .default = codigoBarrioComuna
-    ),
-    nombreBarrioUnificado=case_when(
-      codigoBarrioComunaUnificado=="314"~ "San José la Cima",
-      codigoBarrioComunaUnificado=="914"~ "Asomadera",
-      .default = nombreBarrio
     )
   )
 
