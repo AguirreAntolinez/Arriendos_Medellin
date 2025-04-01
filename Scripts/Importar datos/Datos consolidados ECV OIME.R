@@ -60,8 +60,7 @@ data_consolidada<-data_consolidada %>%
       codigoBarrioComuna=="315" ~ "314",
       codigoBarrioComuna=="915" ~ "914",
       codigoBarrioComuna=="916" ~ "914",
-      .default = codigoBarrioComuna
-    ),
+      .default = codigoBarrioComuna),
     nombreBarrioUnificado=case_when(
       codigoBarrioComunaUnificado=="314"~ "San José la Cima",
       codigoBarrioComunaUnificado=="914"~ "Asomadera",

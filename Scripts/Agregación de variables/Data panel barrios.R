@@ -71,28 +71,27 @@ data_consolidada<-data_consolidada %>%
          
   
 
-
-Personas_barrio<-data_consolidada %>% 
-  mutate(base_personas=1) %>%   
-  group_by(medicion,codigoBarrioComunaUnificado,nombreBarrioUnificado) %>% 
+Personas_barrio<-data_consolidada %>%
+  mutate(base_personas=1) %>%
+  group_by(medicion,codigoBarrioComunaUnificado,nombreBarrioUnificado) %>%
   summarise(
-    Base_Personas=sum(base_personas),
-    Poblacion=sum(FEP_barrio),
+    Base_Personas=sum(base_personas, na.rm = TRUE),
+    Poblacion=sum(FEP_barrio,na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
-    
+
     total_migrantes_internal = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),
     porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
-    
-    total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),   
+
+    total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),
     porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
-    
-    total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),  
+
+    total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),
     porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
-    
-    total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),   
+
+    total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),
     porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion),
-    
+
     )
 
 
