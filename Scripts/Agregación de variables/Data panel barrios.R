@@ -104,7 +104,7 @@ Barrio_anterior<-data_consolidada %>%
     Base_PersonasBarrioAnterior=sum(base_personas, na.rm = TRUE),
     PoblacionBarrioAnterior=sum(FEP_barrio,na.rm = TRUE),
       ) %>% 
-  rename(codigoBarrioComuna=codigoBarrioComunaAnterior)
+  rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
 
 calcular_moda <- function(x) {
   tabla <- table(x)  
