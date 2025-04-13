@@ -85,6 +85,8 @@ Personas_barrio<-data_consolidada %>%
 
     total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),
     porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
+    
+    anios_en_barrio=weighted.mean(x = anios_en_barrio,w = FEP_barrio,na.rm=TRUE),
 
     total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),
     porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
