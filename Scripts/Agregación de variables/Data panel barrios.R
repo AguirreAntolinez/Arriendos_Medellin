@@ -97,6 +97,15 @@ Personas_barrio<-data_consolidada %>%
     )
 
 
+Barrio_anterior<-data_consolidada %>%
+  mutate(base_personas=1) %>%
+  group_by(medicion,codigoBarrioComunaAnteriorUnificado) %>%
+  summarise(
+    Base_PersonasBarrioAnterior=sum(base_personas, na.rm = TRUE),
+    PoblacionBarrioAnterior=sum(FEP_barrio,na.rm = TRUE),
+      ) %>% 
+  rename(codigoBarrioComuna=codigoBarrioComunaAnterior)
+
 calcular_moda <- function(x) {
   tabla <- table(x)  
   moda <- as.numeric(names(tabla)[tabla == max(tabla)])  
@@ -219,7 +228,8 @@ viviendas<-viviendas %>%
 data_barrios<-Personas_barrio %>% 
   left_join(Viviendas_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
   left_join(Hogares_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
-  left_join(viviendas,by=c("codigoBarrioComunaUnificado","medicion"))
+  left_join(viviendas,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
+  left_join(Barrio_anterior,by=c("codigoBarrioComunaUnificado","medicion"))
 
 #Aqui se rellenan mientras tantos los NA con la cantidad de viviendas de 2014
 data_barrios <- data_barrios %>% 
