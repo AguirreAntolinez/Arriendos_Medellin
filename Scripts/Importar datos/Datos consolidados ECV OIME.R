@@ -21,6 +21,7 @@ data_consolidada<-bind_rows(data_consolidada)
 
 #Asignar el factor de expansión
 factor_expansion<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/factor_expansion.csv",header = TRUE,sep = ",")
+factor_expansionCiudad<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/factor_expansionCiudad.csv",header = TRUE,sep = ",")
 
 data_consolidada<-data_consolidada %>% 
   mutate(
@@ -55,6 +56,7 @@ data_consolidada<-data_consolidada %>%
     key=paste0(codigoBarrioComuna,"_",Sexo,"_",GrupoEdad2,"_",medicion)
     ) %>%
   inner_join(factor_expansion, by = "key") %>% 
+  inner_join(factor_expansionCiudad, by = "medicion","Sexo","GrupoEdad2") %>% 
   mutate(
     codigoBarrioComunaUnificado=case_when(
       codigoBarrioComuna=="315" ~ "314",
