@@ -23,8 +23,12 @@ data_consolidada<-bind_rows(data_consolidada)
 factor_expansion<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/factor_expansion.csv",header = TRUE,sep = ",")
 factor_expansionCiudad<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/factor_expansionCiudad.csv",header = TRUE,sep = ",")
 
+data_consolidada$Sexo
+
 data_consolidada<-data_consolidada %>% 
   mutate(
+    Sexo=as.numeric(Sexo),
+    medicion=as.numeric(medicion),
     GrupoEdad=case_when(
       Edad <=  4 ~ 1,
       Edad >= 5 & Edad <=9 ~ 2,
