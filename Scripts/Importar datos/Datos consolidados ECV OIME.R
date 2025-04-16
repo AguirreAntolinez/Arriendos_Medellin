@@ -22,7 +22,7 @@ data_consolidada<-bind_rows(data_consolidada)
 #Asignar el factor de expansión
 factor_expansion<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/factor_expansion.csv",header = TRUE,sep = ",")
 factor_expansionCiudad<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/factor_expansionCiudad.csv",header = TRUE,sep = ",")
-str(factor_expansionCiudad$GrupoEdad2)
+
 
 data_consolidada<-data_consolidada %>% 
   mutate(
