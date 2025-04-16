@@ -39,6 +39,7 @@ data_consolidada<-data_consolidada %>% filter(
 #Modificar tipos de variables
 data_consolidada<-data_consolidada %>% 
   mutate(FEP_barrio=as.numeric(FEP_barrio),
+         FEP_Ciudad=as.numeric(FEP_Ciudad),
          factorExpHogares=as.numeric(factorExpHogares),
          factorExpViviendas=as.numeric(factorExpViviendas),
          Edad=as.numeric(Edad),
