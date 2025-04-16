@@ -78,6 +78,7 @@ Personas_barrio<-data_consolidada %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),
     Poblacion=sum(FEP_barrio,na.rm = TRUE),
+    PoblacionCiudad=sum(FEP_Ciudad, na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
 
