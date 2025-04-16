@@ -232,7 +232,7 @@ Hogares_barrioAnterior<-data_consolidada %>% filter(!is.na(codigoBarrioComunaAnt
   distinct() %>% 
   group_by(codigoBarrioComunaAnteriorUnificado,medicion) %>% 
   summarise(HogaresBarrioAnterior=sum(factorExpHogares) ) %>% 
-  rename(codigoBarrioUnificado=codigoBarrioComunaAnteriorUnificado)
+  rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
   
 
 #Consolidar el panel de barrios
