@@ -243,6 +243,12 @@ data_barrios<-Personas_barrio %>%
   left_join(Barrio_anterior,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
   left_join(Hogares_barrioAnterior,by=c("codigoBarrioComunaUnificado","medicion"))
 
+data_barrios<-data_barrios %>% 
+  mutate(
+    PoblacionBarrioAnterior=ifelse(is.na(PoblacionBarrioAnterior),0,PoblacionBarrioAnterior),
+    HogaresBarrioAnterior=ifelse(is.na(HogaresBarrioAnterior),0,HogaresBarrioAnterior)
+    )
+
 #Aqui se rellenan mientras tantos los NA con la cantidad de viviendas de 2014
 data_barrios <- data_barrios %>% 
   group_by(codigoBarrioComunaUnificado) %>%  
