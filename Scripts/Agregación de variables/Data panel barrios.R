@@ -190,7 +190,8 @@ ipc<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Med
 ipc<-ipc %>% rename(medicion=Año) %>% select(medicion,Indice) 
 
 Hogares_barrio<-data_consolidada %>% filter(!is.na(codigoBarrioComunaUnificado) & !is.na(valor_arriendo)  ) %>% 
-  select(codigoBarrioComunaUnificado,medicion,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
+  select(codigoBarrioComunaUnificado,medicion,skHogar,valor_arriendo,factorExpHogares #,FEP_barrio
+         ) %>% 
   distinct() %>% 
   group_by(codigoBarrioComunaUnificado,medicion) %>% 
   summarise(Hogares=sum(factorExpHogares),
@@ -226,13 +227,21 @@ viviendas<-viviendas %>%
   summarise(viviendas=sum(viviendas,na.rm = TRUE)) 
   
 
+Hogares_barrioAnterior<-data_consolidada %>% filter(!is.na(codigoBarrioComunaAnteriorUnificado) & !is.na(valor_arriendo)  ) %>% 
+  select(codigoBarrioComunaAnteriorUnificado,medicion,skHogar,factorExpHogares) %>% 
+  distinct() %>% 
+  group_by(codigoBarrioComunaAnteriorUnificado,medicion) %>% 
+  summarise(HogaresBarrioAnterior=sum(factorExpHogares) ) %>% 
+  rename(codigoBarrioUnificado=codigoBarrioComunaAnteriorUnificado)
+  
 
 #Consolidar el panel de barrios
 data_barrios<-Personas_barrio %>% 
   left_join(Viviendas_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
   left_join(Hogares_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
   left_join(viviendas,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
-  left_join(Barrio_anterior,by=c("codigoBarrioComunaUnificado","medicion"))
+  left_join(Barrio_anterior,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
+  left_join(Hogares_barrioAnterior,by=c("codigoBarrioComunaUnificado","medicion"))
 
 #Aqui se rellenan mientras tantos los NA con la cantidad de viviendas de 2014
 data_barrios <- data_barrios %>% 
