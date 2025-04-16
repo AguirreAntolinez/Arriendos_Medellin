@@ -186,7 +186,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
   
 
 ipc<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/IPC/IPC.csv")
-ipc<-ipc %>% rename(medicion=Año) %>% select(medicion,Indice) %>% mutate(medicion=as.character(medicion))
+ipc<-ipc %>% rename(medicion=Año) %>% select(medicion,Indice) 
 
 Hogares_barrio<-data_consolidada %>% filter(!is.na(codigoBarrioComunaUnificado) & !is.na(valor_arriendo)  ) %>% 
   select(codigoBarrioComunaUnificado,medicion,skHogar,valor_arriendo,factorExpHogares,FEP_barrio) %>% 
@@ -209,6 +209,7 @@ viviendas<-viviendas %>%
                names_to = "medicion",
                values_to = "viviendas") %>% 
   mutate(medicion=as.character(sub("X","",medicion)),
+         medicion=as.numeric(medicion),
          codigoBarrioComuna=as.character(codigoBarrioComuna)) %>% 
   select(codigoBarrioComuna,medicion,viviendas) %>% 
   mutate(
