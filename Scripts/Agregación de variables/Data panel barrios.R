@@ -105,6 +105,7 @@ Barrio_anterior<-data_consolidada %>%
   summarise(
     Base_PersonasBarrioAnterior=sum(base_personas, na.rm = TRUE),
     PoblacionBarrioAnterior=sum(FEP_Ciudad,na.rm = TRUE),
+    PoblacionBarrioAnterior2=sum(FEP_barrio,na.rm = TRUE),
       ) %>% 
   rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
 
