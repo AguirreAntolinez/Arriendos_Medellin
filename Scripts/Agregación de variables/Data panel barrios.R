@@ -72,6 +72,7 @@ Personas_barrio<-data_consolidada %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),
     Poblacion=sum(FEP_barrio,na.rm = TRUE),
+    PoblacionCiudad=sum(FEP_Ciudad, na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
 
@@ -239,7 +240,7 @@ data_barrios<-Personas_barrio %>%
 data_barrios<-data_barrios %>% 
   mutate(
     PoblacionBarrioAnterior=ifelse(is.na(PoblacionBarrioAnterior),0,PoblacionBarrioAnterior),
-    HogaresBarrioAnterior=ifelse(is.na(HogaresBarrioAnterior),0,HogaresBarrioAnterior)
+    HogaresBarrioAnterior=ifelse(is.na(HogaresBarrioAnterior),0,HogaresBarrioAnterior),
     )
 
 #Aqui se rellenan mientras tantos los NA con la cantidad de viviendas de 2014
