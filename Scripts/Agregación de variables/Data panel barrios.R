@@ -72,7 +72,6 @@ Personas_barrio<-data_consolidada %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),
     Poblacion=sum(FEP_barrio,na.rm = TRUE),
-    PoblacionCiudad=sum(FEP_Ciudad, na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
 
@@ -98,7 +97,7 @@ Barrio_anterior<-data_consolidada %>%
   group_by(medicion,codigoBarrioComunaAnteriorUnificado) %>%
   summarise(
     Base_PersonasBarrioAnterior=sum(base_personas, na.rm = TRUE),
-    PoblacionBarrioAnterior=sum(FEP_barrio,na.rm = TRUE),
+    PoblacionBarrioAnterior=sum(FEP_Ciudad,na.rm = TRUE),
       ) %>% 
   rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
 
