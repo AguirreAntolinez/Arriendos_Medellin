@@ -250,3 +250,34 @@ data_barrios <- data_barrios %>%
   ungroup()  
 
 faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComunaUnificado","medicion"))
+
+
+
+#############
+
+# Paso 1: personas que migraron dentro de la ciudad
+migrantes_intraurbano <- data_consolidada %>%
+  filter(!is.na(codigoBarrrioComunaAnterior)) %>%
+  mutate(medicion_origen = medicion - 1)
+
+# Paso 2: estimar cantidad de personas que salieron de cada barrio en cada año (expandido)
+salidas_por_barrio <- migrantes_intraurbano %>%
+  group_by(medicion_origen, barrio_origen = codigoBarrrioComunaAnterior) %>%
+  summarise(salidas_expandidas = sum(FEP_barrio, na.rm = TRUE), .groups = "drop")
+
+# Paso 3: población total por barrio en cada año (de toda la muestra)
+poblacion_por_barrio <- data_consolidada %>%
+  group_by(medicion, barrio = codigoBarrioComuna) %>%
+  summarise(poblacion_expandidas = sum(FEP_barrio, na.rm = TRUE), .groups = "drop")
+
+# Paso 4: unir y calcular la tasa de salida
+tasa_salida <- salidas_por_barrio %>%
+  left_join(poblacion_por_barrio, 
+            by = c("medicion_origen" = "medicion", "barrio_origen" = "barrio")) %>%
+  mutate(tasa_salida = salidas_expandidas / poblacion_expandidas)
+
+# Resultado: tasa de salida por barrio y año
+tasa_salida %>%
+  select(medicion_origen, barrio_origen, tasa_salida)
+
+
