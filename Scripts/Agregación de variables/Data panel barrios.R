@@ -98,7 +98,7 @@ Barrio_anterior<-data_consolidada %>%
   group_by(medicion,codigoBarrioComunaAnteriorUnificado) %>%
   summarise(
     Base_PersonasBarrioAnterior=sum(base_personas, na.rm = TRUE),
-    PoblacionBarrioAnterior=sum(FEP_Ciudad,na.rm = TRUE),
+    PoblacionBarrioAnterior=sum(FEP_barrio,na.rm = TRUE),
       ) %>% 
   rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
 
