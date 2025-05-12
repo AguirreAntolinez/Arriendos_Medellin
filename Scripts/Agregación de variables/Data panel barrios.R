@@ -39,7 +39,7 @@ data_consolidada<-data_consolidada %>% filter(
 #Modificar tipos de variables
 data_consolidada<-data_consolidada %>% 
   mutate(FEP_barrio=as.numeric(FEP_barrio),
-         FEP_Ciudad=as.numeric(FEP_Ciudad),
+         #FEP_Ciudad=as.numeric(FEP_Ciudad),
          factorExpHogares=as.numeric(factorExpHogares),
          factorExpViviendas=as.numeric(factorExpViviendas),
          Edad=as.numeric(Edad),
@@ -78,7 +78,7 @@ Personas_barrio<-data_consolidada %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),
     Poblacion=sum(FEP_barrio,na.rm = TRUE),
-    PoblacionCiudad=sum(FEP_Ciudad, na.rm = TRUE),
+    #PoblacionCiudad=sum(FEP_Ciudad, na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
 
@@ -104,8 +104,7 @@ Barrio_anterior<-data_consolidada %>%
   group_by(medicion,codigoBarrioComunaAnteriorUnificado) %>%
   summarise(
     Base_PersonasBarrioAnterior=sum(base_personas, na.rm = TRUE),
-    PoblacionBarrioAnterior=sum(FEP_Ciudad,na.rm = TRUE),
-    PoblacionBarrioAnterior2=sum(FEP_barrio,na.rm = TRUE),
+    PoblacionBarrioAnterior=sum(FEP_barrio,na.rm = TRUE),
       ) %>% 
   rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
 
