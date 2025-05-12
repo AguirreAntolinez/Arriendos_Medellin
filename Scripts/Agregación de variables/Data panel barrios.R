@@ -20,18 +20,12 @@ mediciones<-c('2008','2009','2010',
               '2014','2015','2016',
               '2017','2018','2019')
 
-# barrios_sin_arrendamiento<-c('1008','108','1103','1401','1408',
-#                              '1414','1416','1418','1419','1420',
-#                              '1502','1604','1618','1621','314',
-#                              '315','517','612','702','705',
-#                              '725','805','915','916','917')
 
 data_consolidada<-data_consolidada %>% filter(
   zona=='U' & 
     Cod_comuna %in% comunas & 
-    medicion %in% mediciones #&
-    #!codigoBarrioComuna %in% barrios_sin_arrendamiento
-    )
+    medicion %in% mediciones
+        )
 
 
 
@@ -39,7 +33,7 @@ data_consolidada<-data_consolidada %>% filter(
 #Modificar tipos de variables
 data_consolidada<-data_consolidada %>% 
   mutate(FEP_barrio=as.numeric(FEP_barrio),
-         #FEP_Ciudad=as.numeric(FEP_Ciudad),
+         FEP_Ciudad=as.numeric(FEP_Ciudad),
          factorExpHogares=as.numeric(factorExpHogares),
          factorExpViviendas=as.numeric(factorExpViviendas),
          Edad=as.numeric(Edad),
@@ -78,7 +72,7 @@ Personas_barrio<-data_consolidada %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),
     Poblacion=sum(FEP_barrio,na.rm = TRUE),
-    #PoblacionCiudad=sum(FEP_Ciudad, na.rm = TRUE),
+    PoblacionCiudad=sum(FEP_Ciudad, na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
 
@@ -256,43 +250,3 @@ data_barrios <- data_barrios %>%
   ungroup()  
 
 faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComunaUnificado","medicion"))
-
-#Calcular las tasas de variacion
-data_barrios <- data_barrios %>%
-  arrange(codigoBarrioComunaUnificado, medicion) %>%  # Asegurar que los datos estén ordenados
-  group_by(codigoBarrioComunaUnificado) %>%  # Agrupar por barrio
-  mutate(
-    viviendas_lag=lag(viviendas),
-    var_viviendas = case_when(
-      viviendas_lag==0~100,
-      is.na(viviendas_lag)~NA,
-      TRUE~ (viviendas - viviendas_lag) / viviendas_lag * 100),
-    
-    poblacion_lag=lag(Poblacion),
-    var_poblacion = case_when(
-      poblacion_lag==0~100,
-      is.na(poblacion_lag)~NA,
-      TRUE~ (Poblacion - poblacion_lag) / poblacion_lag * 100),
-    
-    migrante_internal_lag=lag(total_migrantes_internal),
-    var_migrante_internal = case_when(
-      migrante_internal_lag==0~100,
-      is.na(migrante_internal_lag)~NA,
-      TRUE~ (total_migrantes_internal - migrante_internal_lag) / migrante_internal_lag * 100),
-    
-    migrante_intermun_lag=lag(total_migrantes_intermun),
-    var_migrante_intermun = case_when(
-      migrante_intermun_lag==0~100,
-      is.na(migrante_intermun_lag)~NA,
-      TRUE~ (total_migrantes_intermun - migrante_intermun_lag) / migrante_intermun_lag * 100),
-    
-    migrante_intraurb_lag=lag(total_migrantes_intraurb),
-    var_migrante_intraurb = case_when(
-      migrante_intraurb_lag==0~100,
-      is.na(migrante_intraurb_lag)~NA,
-      TRUE~ (total_migrantes_intraurb - migrante_intraurb_lag) / migrante_intraurb_lag * 100)) %>% 
-    
-  ungroup() 
-
-
-
