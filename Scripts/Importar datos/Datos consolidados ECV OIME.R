@@ -58,7 +58,7 @@ data_consolidada<-data_consolidada %>%
       , .default = NA),
     key=paste0(codigoBarrioComuna,"_",Sexo,"_",GrupoEdad2,"_",medicion)
     ) %>%
-  inner_join(factor_expansion, by = "key") %>% 
+  inner_join(factor_expansion, by =c("medicion","Sexo","GrupoEdad2")) %>% 
   inner_join(factor_expansionCiudad, by =c("medicion","Sexo","GrupoEdad2")) %>% 
   mutate(
     codigoBarrioComunaUnificado=case_when(
