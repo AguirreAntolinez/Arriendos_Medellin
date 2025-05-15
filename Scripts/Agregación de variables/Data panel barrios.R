@@ -67,7 +67,8 @@ data_consolidada<-data_consolidada %>%
   
 
 Personas_barrio<-data_consolidada %>%
-  mutate(base_personas=1) %>%
+  mutate(base_personas=1
+         ) %>%
   group_by(medicion,codigoBarrioComunaUnificado,nombreBarrioUnificado) %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),
@@ -89,7 +90,7 @@ Personas_barrio<-data_consolidada %>%
 
     total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),
     porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion),
-
+    
     )
 
 
@@ -229,13 +230,39 @@ Hogares_barrioAnterior<-data_consolidada %>% filter(!is.na(codigoBarrioComunaAnt
   rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
   
 
+tasa_salida<- data_consolidada %>% 
+  mutate(
+    cambio_barrio=case_when(
+      vivia_en_otro_pais==0 &
+      vivia_en_otro_municipio==0 &
+      vivia_en_otro_barrio==0 ~0, .default = 1),
+    cambio_barrio_ponderado=cambio_barrio*FEP_barrio
+    ) %>% 
+  arrange(codigoBarrioComunaUnificado, medicion) %>% 
+  group_by(medicion,codigoBarrioComunaUnificado) %>% 
+  summarise(poblacion=sum(FEP_barrio, na.rm = TRUE),
+            cambio_barrio=sum(cambio_barrio_ponderado, na.rm = TRUE),
+            ) %>% 
+  group_by(codigoBarrioComunaUnificado) %>% 
+  mutate(
+    poblacion_anterior=lag(poblacion,n=1)
+    ) %>% 
+  ungroup() %>% 
+  mutate(
+    tasa_salida=cambio_barrio/poblacion_anterior
+    ) %>% 
+  select(medicion,codigoBarrioComunaUnificado,poblacion_anterior,tasa_salida)
+  
+  
+
 #Consolidar el panel de barrios
 data_barrios<-Personas_barrio %>% 
   left_join(Viviendas_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
   left_join(Hogares_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
   left_join(viviendas,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
   left_join(Barrio_anterior,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
-  left_join(Hogares_barrioAnterior,by=c("codigoBarrioComunaUnificado","medicion"))
+  left_join(Hogares_barrioAnterior,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
+  left_join(tasa_salida,by=c("codigoBarrioComunaUnificado","medicion")) 
 
 data_barrios<-data_barrios %>% 
   mutate(
@@ -254,32 +281,3 @@ faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComunaUnif
 
 
 #############
-
-# Paso 1: personas que migraron dentro de la ciudad
-migrantes_intraurbano <- data_consolidada %>%
-  filter(!is.na(codigoBarrioComunaAnteriorUnificado)) %>%
-  mutate(medicion_origen = medicion - 1)
-
-# Paso 2: estimar cantidad de personas que salieron de cada barrio en cada año (expandido)
-salidas_por_barrio <- migrantes_intraurbano %>%
-  group_by(medicion_origen, barrio_origen = codigoBarrioComunaAnteriorUnificado) %>%
-  summarise(salidas_expandidas = sum(FEP_barrio, na.rm = TRUE), .groups = "drop")
-
-# Paso 3: población total por barrio en cada año (de toda la muestra)
-poblacion_por_barrio <- data_consolidada %>%
-  group_by(medicion, barrio = codigoBarrioComunaUnificado) %>%
-  summarise(poblacion_expandidas = sum(FEP_barrio, na.rm = TRUE), .groups = "drop")
-
-# Paso 4: unir y calcular la tasa de salida
-tasa_salida <- salidas_por_barrio %>%
-  left_join(poblacion_por_barrio, 
-            by = c("medicion_origen" = "medicion", "barrio_origen" = "barrio")) %>%
-  mutate(tasa_salida = salidas_expandidas / poblacion_expandidas) %>% 
-  filter(medicion_origen %in% mediciones)
-  
-
-# Resultado: tasa de salida por barrio y año
-tasa_salida %>%
-  select(medicion_origen, barrio_origen, tasa_salida)
-
-
