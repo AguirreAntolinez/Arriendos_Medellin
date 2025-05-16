@@ -18,31 +18,6 @@ for (i in chunks){
 
 #Unir los chunks
 data_consolidada<-bind_rows(data_consolidada)
-comunas<-c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16")
-#Quitar barrios que no van en el estudio
-barrios_me_alto<-c('1005', '1006', '1008', '1011', '1401', '1408',
-                   '1418', '1419', '1420', '517', '702', '725')
-
-
-barrios_mediciones_incompletas<-c('312','408','705','724','805','1007',
-                                  '1502','1621')
-
-barrios_sin_personas_en_arriendo<-c('108','917','1103','1414','1416',
-                                    '1604','1618')
-
-data_consolidada<- data_consolidada %>% 
-  filter(!codigoBarrioComuna %in% barrios_me_alto &
-           !codigoBarrioComuna %in% barrios_mediciones_incompletas &
-           !codigoBarrioComuna %in% barrios_sin_personas_en_arriendo &
-           zona =="U"&
-           Cod_comuna %in% comunas
-         
-  ) 
-
-
-#Quitar mediciones que no van en el estudio
-data_consolidada<-data_consolidada %>% filter(medicion>2007)
-
 #Validar valores unicos
 data_consolidada %>%
   group_by(across(c(codigoBarrioComuna, Sexo, GrupoEdad2, medicion))) %>%
@@ -53,7 +28,6 @@ data_consolidada %>%
 
 #Asignar el factor de expansión
 factor_expansion<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/factor_expansion.csv",header = TRUE,sep = ",")
-factor_expansionCiudad<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/factor_expansionCiudad.csv",header = TRUE,sep = ",")
 
 
 data_consolidada<-data_consolidada %>% 
@@ -90,10 +64,8 @@ data_consolidada<-data_consolidada %>%
       GrupoEdad==14 | GrupoEdad==15 | GrupoEdad==16  | GrupoEdad==17 ~ 7
       , .default = NA),
     key=paste0(codigoBarrioComuna,"_",Sexo,"_",GrupoEdad2,"_",medicion)
-    ) 
-%>%
+    ) %>%
   inner_join(factor_expansion, by =c("codigoBarrioComuna","Sexo","GrupoEdad2","medicion")) %>% 
-  #inner_join(factor_expansionCiudad, by =c("medicion","Sexo","GrupoEdad2")) %>% 
   mutate(
     codigoBarrioComunaUnificado=case_when(
       codigoBarrioComuna==315 ~ 314,
@@ -103,18 +75,16 @@ data_consolidada<-data_consolidada %>%
     nombreBarrioUnificado=case_when(
       codigoBarrioComunaUnificado==314~ "San José la Cima",
       codigoBarrioComunaUnificado==914~ "Asomadera",
-      .default = nombreBarrio),
-    codigoBarrioComunaAnteriorUnificado=case_when(
-      codigoBarrioComunaAnterior=="315" ~ "314",
-      codigoBarrioComunaAnterior=="915" ~ "914",
-      codigoBarrioComunaAnterior=="916" ~ "914",
-      .default = codigoBarrioComunaAnterior)
-      ) %>% 
+       .default = nombreBarrio)
+         ) %>% 
   filter(medicion>2007)
   
-  
-
-#rentas_depurado<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/RENTAS%20OIME/rentas_depurado.csv",header = TRUE,sep = ";")
+#Validar valores unicos
+data_consolidada %>%
+  group_by(across(c(codigoBarrioComuna, Sexo, GrupoEdad2, medicion))) %>%
+  mutate(duplicado = duplicated(across(everything()))) %>%
+  ungroup() %>%
+  count(duplicado)  
 
 t2<-Sys.time()
 

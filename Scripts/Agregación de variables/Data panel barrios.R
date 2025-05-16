@@ -9,31 +9,9 @@
 
 ##Para detalles y comentarios: alexander.aguirre@udea.edu.co
 
-#Excluir los corregimientos
-comunas<-c('1','2','3','4',
-           '5','6','7','8',
-           '9','10','11','12',
-           '13','14','15','16')
-
-mediciones<-c('2008','2009','2010',
-              '2011','2012','2013',
-              '2014','2015','2016',
-              '2017','2018','2019')
-
-
-data_consolidada<-data_consolidada %>% filter(
-  zona=='U' & 
-    Cod_comuna %in% comunas & 
-    medicion %in% mediciones
-        )
-
-
-
-
 #Modificar tipos de variables
 data_consolidada<-data_consolidada %>% 
   mutate(FEP_barrio=as.numeric(FEP_barrio),
-         FEP_Ciudad=as.numeric(FEP_Ciudad),
          factorExpHogares=as.numeric(factorExpHogares),
          factorExpViviendas=as.numeric(factorExpViviendas),
          Edad=as.numeric(Edad),
@@ -65,33 +43,32 @@ data_consolidada<-data_consolidada %>%
          )
          
   
-
+# Agregar las variables de personas a nivel de barrio
 Personas_barrio<-data_consolidada %>%
-  mutate(base_personas=1
+  mutate(
+    base_personas=1,
+    vivia_en_otro_pais = vivia_en_otro_pais * FEP_barrio,
+    vivia_en_otro_municipio = vivia_en_otro_municipio * FEP_barrio,
+    vivia_en_otro_barrio = vivia_en_otro_barrio * FEP_barrio,
+    vive_arriendo = vive_arriendo * FEP_barrio
+         
          ) %>%
   group_by(medicion,codigoBarrioComunaUnificado,nombreBarrioUnificado) %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),
     Poblacion=sum(FEP_barrio,na.rm = TRUE),
-    PoblacionCiudad=sum(FEP_Ciudad, na.rm = TRUE),
     Base_Viviendas= n_distinct(skVivienda),
     Base_Hogares= n_distinct(skHogar),
-
-    total_migrantes_internal = sum(vivia_en_otro_pais * FEP_barrio, na.rm = TRUE),
-    porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
-
-    total_migrantes_intermun = sum(vivia_en_otro_municipio * FEP_barrio, na.rm = TRUE),
-    porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
-    
+    total_migrantes_internal = sum(vivia_en_otro_pais, na.rm = TRUE),
+    total_migrantes_intermun = sum(vivia_en_otro_municipio, na.rm = TRUE),
     anios_en_barrio=weighted.mean(x = anios_en_barrio,w = FEP_barrio,na.rm=TRUE),
-
-    total_migrantes_intraurb = sum(vivia_en_otro_barrio * FEP_barrio, na.rm = TRUE),
-    porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
-
-    total_viven_arriendo = sum(vive_arriendo * FEP_barrio, na.rm = TRUE),
-    porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion),
-    
-    )
+    total_migrantes_intraurb = sum(vivia_en_otro_barrio, na.rm = TRUE),
+    total_viven_arriendo = sum(vive_arriendo, na.rm = TRUE)
+    ) %>% 
+  mutate(porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
+         porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
+         porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
+         porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion))
 
 
 Barrio_anterior<-data_consolidada %>%
@@ -211,10 +188,10 @@ viviendas<-viviendas %>%
   select(codigoBarrioComuna,medicion,viviendas) %>% 
   mutate(
     codigoBarrioComunaUnificado=case_when(
-      codigoBarrioComuna=="315" ~ "314",
-      codigoBarrioComuna=="915" ~ "914",
-      codigoBarrioComuna=="916" ~ "914",
-      .default = codigoBarrioComuna
+      codigoBarrioComuna=="315" ~ 314,
+      codigoBarrioComuna=="915" ~ 914,
+      codigoBarrioComuna=="916" ~ 914,
+      .default = as.numeric(codigoBarrioComuna)
     )
   ) %>% 
   select(codigoBarrioComunaUnificado,medicion,viviendas) %>% 
