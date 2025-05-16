@@ -27,7 +27,9 @@ factor_expansionCiudad<-read.csv2("https://raw.githubusercontent.com/AguirreAnto
 data_consolidada<-data_consolidada %>% 
   mutate(
     Sexo=as.numeric(Sexo),
+    codigoBarrioComuna=as.numeric(codigoBarrioComuna),
     medicion=as.numeric(medicion),
+    FEP_barrio=as.numeric(FEP_barrio),
     GrupoEdad=case_when(
       Edad <=  4 ~ 1,
       Edad >= 5 & Edad <=9 ~ 2,
@@ -58,17 +60,17 @@ data_consolidada<-data_consolidada %>%
       , .default = NA),
     key=paste0(codigoBarrioComuna,"_",Sexo,"_",GrupoEdad2,"_",medicion)
     ) %>%
-  inner_join(factor_expansion, by =c("medicion","Sexo","GrupoEdad2")) %>% 
+  inner_join(factor_expansion, by =c("medicion","codigoBarrioComuna","Sexo","GrupoEdad2")) %>% 
   inner_join(factor_expansionCiudad, by =c("medicion","Sexo","GrupoEdad2")) %>% 
   mutate(
     codigoBarrioComunaUnificado=case_when(
-      codigoBarrioComuna=="315" ~ "314",
-      codigoBarrioComuna=="915" ~ "914",
-      codigoBarrioComuna=="916" ~ "914",
+      codigoBarrioComuna==315 ~ 314,
+      codigoBarrioComuna==915 ~ 914,
+      codigoBarrioComuna==916 ~ 914,
       .default = codigoBarrioComuna),
     nombreBarrioUnificado=case_when(
-      codigoBarrioComunaUnificado=="314"~ "San José la Cima",
-      codigoBarrioComunaUnificado=="914"~ "Asomadera",
+      codigoBarrioComunaUnificado==314~ "San José la Cima",
+      codigoBarrioComunaUnificado==914~ "Asomadera",
       .default = nombreBarrio
     ),
     codigoBarrioComunaAnteriorUnificado=case_when(
@@ -76,7 +78,9 @@ data_consolidada<-data_consolidada %>%
       codigoBarrioComunaAnterior=="915" ~ "914",
       codigoBarrioComunaAnterior=="916" ~ "914",
       .default = codigoBarrioComunaAnterior)
-  )
+  ) %>% 
+  filter(medicion>2007)
+  
   
 
 #rentas_depurado<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/RENTAS%20OIME/rentas_depurado.csv",header = TRUE,sep = ";")
