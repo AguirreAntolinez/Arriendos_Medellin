@@ -20,7 +20,7 @@ for (i in chunks){
 data_consolidada<-bind_rows(data_consolidada)
 #Validar valores unicos
 data_consolidada %>%
-  group_by(across(c(codigoBarrioComuna, Sexo, GrupoEdad2, medicion))) %>%
+  group_by(across(c(codigoBarrioComuna, Sexo, medicion))) %>%
   mutate(duplicado = duplicated(across(everything()))) %>%
   ungroup() %>%
   count(duplicado)
