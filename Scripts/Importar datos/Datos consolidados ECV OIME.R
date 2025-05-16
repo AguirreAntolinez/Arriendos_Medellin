@@ -89,4 +89,4 @@ data_consolidada<-data_consolidada %>%
 t2<-Sys.time()
 
 tiempo_descarga<-t2-t1
-tiempo_descarga
+print(tiempo_descarga)
