@@ -71,15 +71,6 @@ Personas_barrio<-data_consolidada %>%
          porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion))
 
 
-Barrio_anterior<-data_consolidada %>%
-  mutate(base_personas=1) %>%
-  group_by(medicion,codigoBarrioComunaAnteriorUnificado) %>%
-  summarise(
-    Base_PersonasBarrioAnterior=sum(base_personas, na.rm = TRUE),
-    PoblacionBarrioAnterior=sum(FEP_barrio,na.rm = TRUE),
-      ) %>% 
-  rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
-
 calcular_moda <- function(x) {
   tabla <- table(x)  
   moda <- as.numeric(names(tabla)[tabla == max(tabla)])  
@@ -199,13 +190,6 @@ viviendas<-viviendas %>%
   summarise(viviendas=sum(viviendas,na.rm = TRUE)) 
   
 
-Hogares_barrioAnterior<-data_consolidada %>% filter(!is.na(codigoBarrioComunaAnteriorUnificado) & !is.na(valor_arriendo)  ) %>% 
-  select(codigoBarrioComunaAnteriorUnificado,medicion,skHogar,factorExpHogares) %>% 
-  distinct() %>% 
-  group_by(codigoBarrioComunaAnteriorUnificado,medicion) %>% 
-  summarise(HogaresBarrioAnterior=sum(factorExpHogares) ) %>% 
-  rename(codigoBarrioComunaUnificado=codigoBarrioComunaAnteriorUnificado)
-  
 
 tasa_salida<- data_consolidada %>% 
   mutate(
@@ -237,8 +221,6 @@ data_barrios<-Personas_barrio %>%
   left_join(Viviendas_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
   left_join(Hogares_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
   left_join(viviendas,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
-  left_join(Barrio_anterior,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
-  left_join(Hogares_barrioAnterior,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
   left_join(tasa_salida,by=c("codigoBarrioComunaUnificado","medicion")) 
 
 data_barrios<-data_barrios %>% 
