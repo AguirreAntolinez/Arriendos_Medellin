@@ -75,9 +75,8 @@ data_consolidada<-data_consolidada %>%
       codigoBarrioComunaAnterior=="315" ~ "314",
       codigoBarrioComunaAnterior=="915" ~ "914",
       codigoBarrioComunaAnterior=="916" ~ "914",
-      .default = codigoBarrioComunaAnterior),
-    FEP_barrio=as.numeric(FEP_barrio)
-  ) %>% 
+      .default = codigoBarrioComunaAnterior)
+      ) %>% 
   filter(medicion>2007)
   
   
