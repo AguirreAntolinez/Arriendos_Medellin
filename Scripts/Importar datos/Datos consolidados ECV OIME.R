@@ -19,11 +19,11 @@ for (i in chunks){
 #Unir los chunks
 data_consolidada<-bind_rows(data_consolidada)
 #Validar valores unicos
-data_consolidada %>%
-  group_by(across(c(codigoBarrioComuna, Sexo, medicion))) %>%
-  mutate(duplicado = duplicated(across(everything()))) %>%
-  ungroup() %>%
-  count(duplicado)
+# data_consolidada %>%
+#   group_by(across(c(codigoBarrioComuna, Sexo, medicion))) %>%
+#   mutate(duplicado = duplicated(across(everything()))) %>%
+#   ungroup() %>%
+#   count(duplicado)
 
 
 #Asignar el factor de expansión
@@ -80,11 +80,11 @@ data_consolidada<-data_consolidada %>%
   filter(medicion>2007)
   
 #Validar valores unicos
-data_consolidada %>%
-  group_by(across(c(codigoBarrioComuna, Sexo, GrupoEdad2, medicion))) %>%
-  mutate(duplicado = duplicated(across(everything()))) %>%
-  ungroup() %>%
-  count(duplicado)  
+# data_consolidada %>%
+#   group_by(across(c(codigoBarrioComuna, Sexo, GrupoEdad2, medicion))) %>%
+#   mutate(duplicado = duplicated(across(everything()))) %>%
+#   ungroup() %>%
+#   count(duplicado)  
 
 t2<-Sys.time()
 
