@@ -29,7 +29,6 @@ data_consolidada<-data_consolidada %>%
     Sexo=as.numeric(Sexo),
     codigoBarrioComuna=as.numeric(codigoBarrioComuna),
     medicion=as.numeric(medicion),
-    FEP_barrio=as.numeric(FEP_barrio),
     GrupoEdad=case_when(
       Edad <=  4 ~ 1,
       Edad >= 5 & Edad <=9 ~ 2,
@@ -71,13 +70,13 @@ data_consolidada<-data_consolidada %>%
     nombreBarrioUnificado=case_when(
       codigoBarrioComunaUnificado==314~ "San José la Cima",
       codigoBarrioComunaUnificado==914~ "Asomadera",
-      .default = nombreBarrio
-    ),
+      .default = nombreBarrio),
     codigoBarrioComunaAnteriorUnificado=case_when(
       codigoBarrioComunaAnterior=="315" ~ "314",
       codigoBarrioComunaAnterior=="915" ~ "914",
       codigoBarrioComunaAnterior=="916" ~ "914",
-      .default = codigoBarrioComunaAnterior)
+      .default = codigoBarrioComunaAnterior),
+    FEP_barrio=as.numeric(FEP_barrio)
   ) %>% 
   filter(medicion>2007)
   
