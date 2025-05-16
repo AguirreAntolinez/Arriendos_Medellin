@@ -6,7 +6,7 @@ options(timeout = 120)
 
 data_consolidada<-list() 
   
-chunks <- sprintf("%03d", 1:10)
+chunks <- sprintf("%03d", 1:6)
   
 for (i in chunks){
   #Poner la ruta base del repositorio 
