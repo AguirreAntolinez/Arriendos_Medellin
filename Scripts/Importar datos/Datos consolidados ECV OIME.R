@@ -18,12 +18,7 @@ for (i in chunks){
 
 #Unir los chunks
 data_consolidada<-bind_rows(data_consolidada)
-#Validar valores unicos
-# data_consolidada %>%
-#   group_by(across(c(codigoBarrioComuna, Sexo, medicion))) %>%
-#   mutate(duplicado = duplicated(across(everything()))) %>%
-#   ungroup() %>%
-#   count(duplicado)
+
 
 
 #Asignar el factor de expansión
@@ -64,7 +59,7 @@ data_consolidada<-data_consolidada %>%
       GrupoEdad==14 | GrupoEdad==15 | GrupoEdad==16  | GrupoEdad==17 ~ 7
       , .default = NA),
     key=paste0(codigoBarrioComuna,"_",Sexo,"_",GrupoEdad2,"_",medicion)
-    ) %>%
+  ) %>%
   inner_join(factor_expansion, by =c("codigoBarrioComuna","Sexo","GrupoEdad2","medicion")) %>% 
   mutate(
     codigoBarrioComunaUnificado=case_when(
@@ -75,10 +70,10 @@ data_consolidada<-data_consolidada %>%
     nombreBarrioUnificado=case_when(
       codigoBarrioComunaUnificado==314~ "San José la Cima",
       codigoBarrioComunaUnificado==914~ "Asomadera",
-       .default = nombreBarrio)
-         ) %>% 
+      .default = nombreBarrio)
+  ) %>% 
   filter(medicion>2007)
-  
+
 #Validar valores unicos
 # data_consolidada %>%
 #   group_by(across(c(codigoBarrioComuna, Sexo, GrupoEdad2, medicion))) %>%

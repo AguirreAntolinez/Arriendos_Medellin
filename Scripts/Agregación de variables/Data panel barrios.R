@@ -50,9 +50,14 @@ Personas_barrio<-data_consolidada %>%
     vivia_en_otro_pais = vivia_en_otro_pais * FEP_barrio,
     vivia_en_otro_municipio = vivia_en_otro_municipio * FEP_barrio,
     vivia_en_otro_barrio = vivia_en_otro_barrio * FEP_barrio,
-    vive_arriendo = vive_arriendo * FEP_barrio
-         
-         ) %>%
+    vive_arriendo = vive_arriendo * FEP_barrio,
+    cambio_barrio = case_when(
+        vivia_en_otro_pais==0 &
+        vivia_en_otro_municipio==0 &
+        vivia_en_otro_barrio==0 ~0, .default = 1),
+    cambio_barrio = cambio_barrio * FEP_barrio
+    
+        ) %>%
   group_by(medicion,codigoBarrioComunaUnificado,nombreBarrioUnificado) %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),
@@ -63,19 +68,24 @@ Personas_barrio<-data_consolidada %>%
     total_migrantes_intermun = sum(vivia_en_otro_municipio, na.rm = TRUE),
     anios_en_barrio=weighted.mean(x = anios_en_barrio,w = FEP_barrio,na.rm=TRUE),
     total_migrantes_intraurb = sum(vivia_en_otro_barrio, na.rm = TRUE),
-    total_viven_arriendo = sum(vive_arriendo, na.rm = TRUE)
+    total_viven_arriendo = sum(vive_arriendo, na.rm = TRUE),
+    total_cambio_barrio = sum(cambio_barrio, na.rm = TRUE)
     ) %>% 
   mutate(porcentaje_migrantes_internacionales = (total_migrantes_internal / Poblacion),
          porcentaje_migrantes_intermun = (total_migrantes_intermun / Poblacion),
          porcentaje_migrantes_intraurb = (total_migrantes_intraurb / Poblacion),
-         porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion))
+         porcentaje_viven_arriendo = (total_viven_arriendo / Poblacion),
+         siguen_en_barrio=Poblacion-total_cambio_barrio
+         )
 
 
-calcular_moda <- function(x) {
-  tabla <- table(x)  
-  moda <- as.numeric(names(tabla)[tabla == max(tabla)])  
-  return(moda)
-}
+Personas_barrio <- Personas_barrio %>%
+  group_by(codigoBarrioComunaUnificado) %>%  # Agrupar por barrio/comuna
+  arrange(codigoBarrioComunaUnificado, medicion) %>%  # Ordenar por año
+  mutate(PoblacionAnterior = lag(Poblacion))  # Crear columna con valor anterior
+
+
+Personas_barrio<- Personas_barrio %>% mutate(tasa_permanencia=siguen_en_barrio/PoblacionAnterior)
 
 Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>% 
   select(codigoBarrioComunaUnificado,
@@ -98,7 +108,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
          pisos_material,
          servicios,
          material_vivienda
-         ) %>% 
+  ) %>% 
   distinct() %>% 
   group_by(codigoBarrioComunaUnificado,medicion) %>% 
   summarise(Viviendas=sum(factorExpViviendas),
@@ -111,7 +121,7 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
             
             posee_gas=sum(posee_gas*factorExpViviendas),
             por_posee_gas=posee_gas/Viviendas,
-              
+            
             posee_aseo=sum(posee_aseo*factorExpViviendas),
             por_posee_aseo=posee_aseo/Viviendas,
             
@@ -146,25 +156,25 @@ Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>%
             
             material_vivienda=sum(material_vivienda*factorExpViviendas),
             por_material_vivienda=material_vivienda/Viviendas
-            )
-  
+  )
+
 
 ipc<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/IPC/IPC.csv")
 ipc<-ipc %>% rename(medicion=Año) %>% select(medicion,Indice) 
 
 Hogares_barrio<-data_consolidada %>% filter(!is.na(codigoBarrioComunaUnificado) & !is.na(valor_arriendo)  ) %>% 
   select(codigoBarrioComunaUnificado,medicion,skHogar,valor_arriendo,factorExpHogares #,FEP_barrio
-         ) %>% 
+  ) %>% 
   distinct() %>% 
   group_by(codigoBarrioComunaUnificado,medicion) %>% 
   summarise(Hogares=sum(factorExpHogares),
             media_arriendo=mean(valor_arriendo,na.rm=TRUE)
-            ) %>% 
+  ) %>% 
   inner_join(ipc, by="medicion") %>% 
   mutate(
-         media_arriendo_real=(media_arriendo/Indice)*100,
-         log_arriendo=log(media_arriendo_real))
-  
+    media_arriendo_real=(media_arriendo/Indice)*100,
+    log_arriendo=log(media_arriendo_real))
+
 
 viviendas<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ESTADISTICAS%20CATASTRALES/Viviendas.csv")
 
@@ -191,37 +201,37 @@ viviendas<-viviendas %>%
   
 
 
-tasa_salida<- data_consolidada %>% 
-  mutate(
-    cambio_barrio=case_when(
-      vivia_en_otro_pais==0 &
-      vivia_en_otro_municipio==0 &
-      vivia_en_otro_barrio==0 ~0, .default = 1),
-    cambio_barrio_ponderado=cambio_barrio*FEP_barrio
-    ) %>% 
-  arrange(codigoBarrioComunaUnificado, medicion) %>% 
-  group_by(medicion,codigoBarrioComunaUnificado) %>% 
-  summarise(poblacion=sum(FEP_barrio, na.rm = TRUE),
-            cambio_barrio=sum(cambio_barrio_ponderado, na.rm = TRUE),
-            ) %>% 
-  group_by(codigoBarrioComunaUnificado) %>% 
-  mutate(
-    poblacion_anterior=lag(poblacion,n=1)
-    ) %>% 
-  ungroup() %>% 
-  mutate(
-    tasa_salida=cambio_barrio/poblacion_anterior
-    ) %>% 
-  select(medicion,codigoBarrioComunaUnificado,poblacion_anterior,tasa_salida)
-  
-  
+# tasa_salida<- data_consolidada %>% 
+#   mutate(
+#     cambio_barrio=case_when(
+#       vivia_en_otro_pais==0 &
+#       vivia_en_otro_municipio==0 &
+#       vivia_en_otro_barrio==0 ~0, .default = 1),
+#     cambio_barrio_ponderado=cambio_barrio*FEP_barrio
+#     ) %>% 
+#   arrange(codigoBarrioComunaUnificado, medicion) %>% 
+#   group_by(medicion,codigoBarrioComunaUnificado) %>% 
+#   summarise(poblacion=sum(FEP_barrio, na.rm = TRUE),
+#             cambio_barrio=sum(cambio_barrio_ponderado, na.rm = TRUE),
+#             ) %>% 
+#   group_by(codigoBarrioComunaUnificado) %>% 
+#   mutate(
+#     poblacion_anterior=lag(poblacion,n=1)
+#     ) %>% 
+#   ungroup() %>% 
+#   mutate(
+#     tasa_salida=cambio_barrio/poblacion_anterior
+#     ) %>% 
+#   select(medicion,codigoBarrioComunaUnificado,poblacion_anterior,tasa_salida)
+#   
+#   
 
 #Consolidar el panel de barrios
 data_barrios<-Personas_barrio %>% 
   left_join(Viviendas_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
   left_join(Hogares_barrio,by=c("codigoBarrioComunaUnificado","medicion")) %>%   
-  left_join(viviendas,by=c("codigoBarrioComunaUnificado","medicion")) %>% 
-  left_join(tasa_salida,by=c("codigoBarrioComunaUnificado","medicion")) 
+  left_join(viviendas,by=c("codigoBarrioComunaUnificado","medicion")) #%>% 
+#  left_join(tasa_salida,by=c("codigoBarrioComunaUnificado","medicion")) 
 
 
 #Aqui se rellenan mientras tantos los NA con la cantidad de viviendas de 2014
