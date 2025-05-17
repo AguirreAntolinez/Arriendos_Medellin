@@ -240,6 +240,6 @@ data_barrios <- data_barrios %>%
 
 faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComunaUnificado","medicion"))
 
-write.csv(factor_expansion,"C:/Users/HP-Laptop/OneDrive - Universidad de Antioquia/Maestría en Economía/Tesis/1. Procesamiento/Arriendos_Medellin/Datos/ECV/Data_Consolidada/data_barrios.csv")
+write.csv(data_barrios,"C:/Users/HP-Laptop/OneDrive - Universidad de Antioquia/Maestría en Economía/Tesis/1. Procesamiento/Arriendos_Medellin/Datos/ECV/Data_Consolidada/data_barrios.csv")
 
 #############
