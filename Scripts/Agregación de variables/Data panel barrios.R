@@ -55,9 +55,7 @@ Personas_barrio<-data_consolidada %>%
         vivia_en_otro_pais==0 &
         vivia_en_otro_municipio==0 &
         vivia_en_otro_barrio==0 ~0, .default = 1),
-    cambio_barrio = cambio_barrio * FEP_barrio
-    
-        ) %>%
+    cambio_barrio = cambio_barrio * FEP_barrio) %>%
   group_by(medicion,codigoBarrioComunaUnificado,nombreBarrioUnificado) %>%
   summarise(
     Base_Personas=sum(base_personas, na.rm = TRUE),

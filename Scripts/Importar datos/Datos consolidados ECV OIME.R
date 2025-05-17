@@ -19,6 +19,27 @@ for (i in chunks){
 #Unir los chunks
 data_consolidada<-bind_rows(data_consolidada)
 
+barrios_me_alto<-c('1005', '1006', '1008', '1011', '1401', '1408',
+                   '1418', '1419', '1420', '517', '702', '725')
+
+
+barrios_mediciones_incompletas<-c('312','408','705','724','805','1007',
+                                  '1502','1621')
+
+barrios_sin_personas_en_arriendo<-c('108','917','1103','1414','1416',
+                                    '1604','1618')
+
+barrio_sin_universo<- c("512")
+
+data_consolidada<- data_consolidada %>% 
+  filter(!codigoBarrioComuna %in% barrios_me_alto &
+           !codigoBarrioComuna %in% barrios_mediciones_incompletas &
+           !codigoBarrioComuna %in% barrios_sin_personas_en_arriendo &
+           !codigoBarrioComuna %in% barrio_sin_universo &
+           !is.na(Edad)
+  ) 
+data_consolidada<-data_consolidada %>% filter(medicion>2007)
+
 
 
 #Asignar el factor de expansión
@@ -71,15 +92,8 @@ data_consolidada<-data_consolidada %>%
       codigoBarrioComunaUnificado==314~ "San José la Cima",
       codigoBarrioComunaUnificado==914~ "Asomadera",
       .default = nombreBarrio)
-  ) %>% 
-  filter(medicion>2007)
+  ) 
 
-#Validar valores unicos
-# data_consolidada %>%
-#   group_by(across(c(codigoBarrioComuna, Sexo, GrupoEdad2, medicion))) %>%
-#   mutate(duplicado = duplicated(across(everything()))) %>%
-#   ungroup() %>%
-#   count(duplicado)  
 
 t2<-Sys.time()
 
