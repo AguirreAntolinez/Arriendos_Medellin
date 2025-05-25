@@ -83,7 +83,9 @@ Personas_barrio <- Personas_barrio %>%
   mutate(PoblacionAnterior = lag(Poblacion))  # Crear columna con valor anterior
 
 
-Personas_barrio<- Personas_barrio %>% mutate(tasa_permanencia=siguen_en_barrio/PoblacionAnterior)
+Personas_barrio<- Personas_barrio %>% mutate(
+  tasa_permanencia=siguen_en_barrio/PoblacionAnterior,
+  tasa_migracion=total_migrantes_internal/PoblacionAnterior)
 
 Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>% 
   select(codigoBarrioComunaUnificado,
