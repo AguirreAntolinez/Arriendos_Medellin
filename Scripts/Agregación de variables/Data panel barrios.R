@@ -81,7 +81,8 @@ Personas_barrio <- Personas_barrio %>%
   group_by(codigoBarrioComunaUnificado) %>%  # Agrupar por barrio/comuna
   arrange(codigoBarrioComunaUnificado, medicion) %>%  # Ordenar por año
   mutate(PoblacionAnterior = lag(Poblacion),
-         MigrantesAcumulados= cumsum(total_migrantes_internal))  # Crear columna con valor anterior
+         MigrantesAcumulados= cumsum(total_migrantes_internal),
+         Poblacion2019= max(if_else(medicion == 2019, Poblacion, NA_real_), na.rm = TRUE))  # Crear columna con valor anterior
 
 
 Personas_barrio<- Personas_barrio %>% mutate(
