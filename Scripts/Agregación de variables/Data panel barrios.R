@@ -89,6 +89,12 @@ Personas_barrio<- Personas_barrio %>% mutate(
   tasa_permanencia=siguen_en_barrio/PoblacionAnterior,
   tasa_migracion=total_migrantes_internal/PoblacionAnterior)
 
+Personas_barrio <- Personas_barrio %>%
+  group_by(codigoBarrioComunaUnificado) %>%  # Agrupar por barrio/comuna
+  arrange(codigoBarrioComunaUnificado, medicion) %>%  # Ordenar por año
+  mutate(tasa_migracion_anterior=lag(tasa_migracion))
+
+
 Viviendas_barrio<-data_consolidada %>% filter(!is.na(skBarrio)) %>% 
   select(codigoBarrioComunaUnificado,
          skVivienda,
