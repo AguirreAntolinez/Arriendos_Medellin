@@ -81,11 +81,16 @@ Personas_barrio <- Personas_barrio %>%
   group_by(codigoBarrioComunaUnificado) %>%  # Agrupar por barrio/comuna
   arrange(codigoBarrioComunaUnificado, medicion) %>%  # Ordenar por año
   mutate(PoblacionAnterior = lag(Poblacion),
+         MigrantesAnterior = lag(total_migrantes_internal),
          MigrantesAcumulados= cumsum(total_migrantes_internal),
          Poblacion2019= max(if_else(medicion == 2019, Poblacion, NA_real_), na.rm = TRUE))  # Crear columna con valor anterior
 
 
 Personas_barrio<- Personas_barrio %>% mutate(
+  delta_migracion= total_migrantes_internal-MigrantesAnterior,
+  
+  tasa_migracion_delta=delta_migracion/PoblacionAnterior,
+  
   tasa_permanencia=siguen_en_barrio/PoblacionAnterior,
   tasa_migracion=total_migrantes_internal/PoblacionAnterior)
 
@@ -252,4 +257,5 @@ faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComunaUnif
 
 write.csv(data_barrios,"C:/Users/HP-Laptop/OneDrive - Universidad de Antioquia/Maestría en Economía/Tesis/1. Procesamiento/Arriendos_Medellin/Datos/ECV/Data_Consolidada/data_barrios.csv")
 
+#writexl::write_xlsx(data_barrios,"data_barrio.xlsx")
 #############
