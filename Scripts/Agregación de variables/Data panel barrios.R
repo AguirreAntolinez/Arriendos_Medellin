@@ -259,13 +259,8 @@ faltantes<-anti_join(data_barrios,Hogares_barrio, by = c("codigoBarrioComunaUnif
 #Agregar migrantes 2005
 censo2005<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/CENSO/2005/PoblacionMigranteBarrios2005.csv",header = TRUE,sep = ",")
 
-censo2005<-censo2005 %>% mutate(
-  codigoBarrioComunaUnificado=case_when(
-    codigoBarrioComuna==315 ~ 314,
-    codigoBarrioComuna==915 ~ 914,
-    codigoBarrioComuna==916 ~ 914,
-    .default = codigoBarrioComuna)
-)
+data_barrios %>% 
+  anti_join(censo2005,by = "codigoBarrioComunaUnificado")
 
 data_barrios<-data_barrios %>% 
   inner_join(censo2005,by = "codigoBarrioComunaUnificado")
@@ -278,14 +273,16 @@ migrantes_medicion<-data_consolidada %>%
     poblacionMigrante=vivia_en_otro_pais*FEP_barrio
     ) %>% 
   group_by(medicion) %>% 
-  summarise(poblacionMigrante=sum(poblacionMigrante,na.rm = TRUE)) 
+  summarise(poblacionMigranteMedicion=sum(poblacionMigrante,na.rm = TRUE)) 
   
 
 data_barrios<-data_barrios %>%
   inner_join(migrantes_medicion, by="medicion")
 
 data_barrios<-data_barrios %>%
-  mutate(VI=as.numeric(porcentajeMigrantes2005)*Poblacion)
+  mutate(
+    VI=(as.numeric(shiftShare)*poblacionMigranteMedicion)/Poblacion)
+
 
 write.csv(data_barrios,"C:/Users/HP-Laptop/OneDrive - Universidad de Antioquia/Maestría en Economía/Tesis/1. Procesamiento/Arriendos_Medellin/Datos/ECV/Data_Consolidada/data_barrios.csv")
 
