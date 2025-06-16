@@ -52,9 +52,8 @@ Personas_barrio<-data_consolidada %>%
     vivia_en_otro_barrio = vivia_en_otro_barrio * FEP_barrio,
     vive_arriendo = vive_arriendo * FEP_barrio,
     cambio_barrio = case_when(
-        vivia_en_otro_pais==0 &
-        vivia_en_otro_municipio==0 &
-        vivia_en_otro_barrio==0 ~0, .default = 1),
+        anios_en_barrio>=1~0,
+        .default = 1),
     cambio_barrio = cambio_barrio * FEP_barrio) %>%
   group_by(medicion,codigoBarrioComunaUnificado,nombreBarrioUnificado) %>%
   summarise(
@@ -77,6 +76,7 @@ Personas_barrio<-data_consolidada %>%
          )
 
 
+
 Personas_barrio <- Personas_barrio %>%
   group_by(codigoBarrioComunaUnificado) %>%  # Agrupar por barrio/comuna
   arrange(codigoBarrioComunaUnificado, medicion) %>%  # Ordenar por año
@@ -91,7 +91,7 @@ Personas_barrio<- Personas_barrio %>% mutate(
   
   tasa_migracion_delta=delta_migracion/PoblacionAnterior,
   
-  tasa_permanencia=siguen_en_barrio/PoblacionAnterior,
+  tasa_permanencia=siguen_en_barrio/Poblacion,
   tasa_migracion=total_migrantes_internal/PoblacionAnterior)
 
 Personas_barrio <- Personas_barrio %>%
@@ -282,6 +282,7 @@ data_barrios<-data_barrios %>%
 data_barrios<-data_barrios %>%
   mutate(
     VI=(as.numeric(shiftShare)*poblacionMigranteMedicion)/Poblacion)
+
 
 
 write.csv(data_barrios,"C:/Users/HP-Laptop/OneDrive - Universidad de Antioquia/Maestría en Economía/Tesis/1. Procesamiento/Arriendos_Medellin/Datos/ECV/Data_Consolidada/data_barrios.csv")
