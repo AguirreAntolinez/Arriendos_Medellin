@@ -282,7 +282,11 @@ data_barrios<-data_barrios %>%
 
 data_barrios<-data_barrios %>%
   mutate(
-    VI=(as.numeric(shiftShare)*poblacionMigranteMedicion)/Poblacion)
+    VI_migracion=(as.numeric(shiftShareMigrantes)*poblacionMigranteMedicion)/Poblacion,
+    VI_otros=(as.numeric(shiftShareResto)*poblacionMigranteMedicion)/Poblacion,
+    VI_Poblacion=VI_migracion+VI_otros
+    )
+
 
 
 
