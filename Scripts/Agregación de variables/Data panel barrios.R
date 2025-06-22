@@ -92,6 +92,7 @@ Personas_barrio<- Personas_barrio %>% mutate(
   tasa_migracion_delta=delta_migracion/PoblacionAnterior,
   
   tasa_permanencia=siguen_en_barrio/Poblacion,
+  tasa_permanencia2=siguen_en_barrio/PoblacionAnterior,
   tasa_migracion=total_migrantes_internal/PoblacionAnterior)
 
 Personas_barrio <- Personas_barrio %>%
