@@ -263,32 +263,43 @@ censo2005<-read.csv2("https://raw.githubusercontent.com/AguirreAntolinez/Arriend
 data_barrios %>% 
   anti_join(censo2005,by = "codigoBarrioComunaUnificado")
 
+
+  
 data_barrios<-data_barrios %>% 
   inner_join(censo2005,by = "codigoBarrioComunaUnificado")
-
 
 migrantes_medicion<-data_consolidada %>% 
   mutate(
     FEP_barrio=as.numeric(FEP_barrio),
     factorExpPersonas=as.numeric(factorExpPersonas),
-    poblacionMigrante=vivia_en_otro_pais*FEP_barrio
+    poblacionMigrante=vivia_en_otro_pais*FEP_barrio,
+    no_vivia_en_otro_pais=ifelse(vivia_en_otro_pais==1,0,1),
+    restoPoblacion=no_vivia_en_otro_pais*FEP_barrio
     ) %>% 
   group_by(medicion) %>% 
-  summarise(poblacionMigranteMedicion=sum(poblacionMigrante,na.rm = TRUE)) 
+  summarise(poblacionMigranteMedicion=sum(poblacionMigrante,na.rm = TRUE),
+            restoPoblacionMedicion=sum(restoPoblacion,na.rm = TRUE),) 
   
 
 data_barrios<-data_barrios %>%
   inner_join(migrantes_medicion, by="medicion")
 
-data_barrios<-data_barrios %>%
+
+names(data_barrios)
+
+
+data_barrios<-data_barrios %>% 
   mutate(
-    VI_migracion=(as.numeric(shiftShareMigrantes)*poblacionMigranteMedicion)/Poblacion,
-    VI_otros=(as.numeric(shiftShareResto)*poblacionMigranteMedicion)/Poblacion,
-    VI_Poblacion=VI_migracion+VI_otros
-    )
-
-
-
+    imput_poblacionMigrante=as.numeric(shiftShareMigrantes)*poblacionMigranteMedicion,
+    imput_restoPoblacion=as.numeric(shiftShareResto)*restoPoblacionMedicion,
+    
+    VI_Migrantes=imput_poblacionMigrante/Poblacion,
+    VI_Poblacion=imput_poblacionMigrante+imput_restoPoblacion
+    
+  )
+summary(data_barrios$VI_Migrantes)
+summary(data_barrios$VI_Poblacion)
+summary(data_barrios$Poblacion)
 
 write.csv(data_barrios,"C:/Users/HP-Laptop/OneDrive - Universidad de Antioquia/Maestría en Economía/Tesis/1. Procesamiento/Arriendos_Medellin/Datos/ECV/Data_Consolidada/data_barrios.csv")
 
