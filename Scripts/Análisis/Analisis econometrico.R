@@ -82,25 +82,18 @@ data_modelo <- data_barrios %>%
       nchar(codigoBarrioComunaUnificado) == 4, substr(codigoBarrioComunaUnificado, 1, 2),
       ifelse(nchar(codigoBarrioComunaUnificado) == 3, substr(codigoBarrioComunaUnificado, 1, 1), NA)
     ),
-   comuna = as.factor(comuna))
+    comuna = as.factor(comuna))
 
 anios<-2008:2019
 
 #### VI con TWFE #####
-#Efecto directo
-vi_efecto_directo <- list()
-
-modelo <- feols(
-  log_arriendo ~ 1 
-  | codigoBarrioComunaUnificado + medicion 
-  | tasa_migracion ~ VI_Migrantes,
-  data = data_modelo,
-  cluster = ~comuna
-)
 
 
 # Loop por pares de años
 # Iterar por cada año
+#Efecto directo
+vi_efecto_directo <- list()
+
 for (i in seq_along(anios)) {
   anio_ini <- as.numeric(as.character(anios[i]))
   anio_fin <- anio_ini + 1
@@ -113,13 +106,13 @@ for (i in seq_along(anios)) {
   resultado <- tryCatch(
     {
       modelo <- feols(
-      log_arriendo ~ 1 
-      | codigoBarrioComunaUnificado + medicion 
-      | tasa_migracion ~ VI_Migrantes,
-      data = datos_par,
-      cluster = ~comuna
-    )
-    # Extraer estadísticas del coeficiente de tasa_migracion
+        log_arriendo ~ 1 
+        | codigoBarrioComunaUnificado + medicion 
+        | tasa_migracion ~ VI_Migrantes,
+        data = datos_par,
+        cluster = ~comuna
+      )
+      # Extraer estadísticas del coeficiente de tasa_migracion
       coef_val <- modelo$coefficients
       se_val   <- modelo$se
       t_val    <- coef_val / se_val
@@ -127,35 +120,43 @@ for (i in seq_along(anios)) {
       primera_etapa<-fitstat(modelo, type = "ivf1")
       f<-primera_etapa$`ivf1::tasa_migracion`[1]                                     
       f<-as.numeric(f)
+      F_KP<-fitstat(modelo, type = "ivwald")
+      f_kp<-F_KP$`ivwald1::tasa_migracion`$stat
+      F_CD<-fitstat(modelo, type = "ivf1")
+      f_cd<-F_CD$`ivf1::tasa_migracion`$stat
       R2<-r2(modelo, type = "r2")
       wR2<-r2(modelo, type ="wr2")
       
-    
-    # Crear data.frame con resultados
-    data.frame(
-      periodo = paste0(anio_ini, "-", anio_fin),
-      beta    = coef_val,
-      se      = se_val,
-      t       = t_val,
-      p       = p_val,
-      f_primer_etapa = f,
-      R2      = R2,
-      wR2     = wR2
-    )
-    
-  }, error = function(e) {
-    # En caso de error, devolver fila con NAs
-    data.frame(
-      periodo = paste0(anio_ini, "-", anio_fin),
-      beta = NA,
-      se = NA,
-      t = NA,
-      p = NA,
-      f_primer_etapa = NA,
-      R2 = NA,
-      wR2= NA
-    )
-  })
+      
+      # Crear data.frame con resultados
+      data.frame(
+        periodo = paste0(anio_ini, "-", anio_fin),
+        beta    = coef_val,
+        se      = se_val,
+        t       = t_val,
+        p       = p_val,
+        f_primer_etapa = f,
+        f_primer_etapa_kp=f_kp,
+        f_primer_etapa_cd=f_cd,
+        R2      = R2,
+        wR2     = wR2
+      )
+      
+    }, error = function(e) {
+      # En caso de error, devolver fila con NAs
+      data.frame(
+        periodo = paste0(anio_ini, "-", anio_fin),
+        beta = NA,
+        se = NA,
+        t = NA,
+        p = NA,
+        f_primer_etapa = NA,
+        f_primer_etapa_kp=NA,
+        f_primer_etapa_cd=NA,
+        R2 = NA,
+        wR2= NA
+      )
+    })
   
   # Guardar el resultado en la lista
   vi_efecto_directo[[i]] <- resultado
@@ -177,6 +178,11 @@ tabla_resultados_vi_efecto_directo<- tabla_resultados_vi_efecto_directo %>%
     modelo="Efecto directo",
     metodo="VI"
   )
+
+
+comparacion_F<-tabla_resultados_vi_efecto_directo %>% select(periodo,f_primer_etapa_cd,f_primer_etapa_kp)
+
+writexl::write_xlsx(comparacion_F,"C:/Users/HP-Laptop/OneDrive - Universidad de Antioquia/Maestría en Economía/Tesis/1. Procesamiento/MigracionMedellin/Scripts/Analisis econométrico/Comparacion Prueba F.xlsx")
 
 # DID Efecto inducido
 vi_efecto_inducido <- list()
@@ -241,7 +247,8 @@ for (i in seq_along(anios)) {
   # Guardar el resultado en la lista
   vi_efecto_inducido[[i]] <- resultado
 }
-
+a<-fitstat(modelo, "kpr")
+a$`ivwald1::tasa_migracion`
 # Unir todos los resultados
 tabla_resultados_vi_efecto_inducido <- bind_rows(vi_efecto_inducido)
 
@@ -300,7 +307,7 @@ for (i in seq_along(anios)) {
         f_primer_etapa = NA,
         R2 = R2,
         wR2 = wR2
-        )
+      )
       
     }, error = function(e) {
       # Si hay error, devolver fila con NAs
@@ -456,7 +463,7 @@ for (i in seq_along(anios)) {
         f_primer_etapa = NA,
         R2 = R2,
         wR2 = NA
-        )
+      )
       
     }, error = function(e) {
       # Si hay error, devolver fila con NAs
@@ -598,12 +605,16 @@ datos_par <- data_modelo %>%
 
 #Efecto directo
 modelo <- feols(
-      log_arriendo ~ 1 
-      | codigoBarrioComunaUnificado + medicion 
-      | tasa_migracion ~ VI_Migrantes,
-      data = datos_par,
-      cluster = ~comuna
-    )
+  log_arriendo ~ 1 
+  | codigoBarrioComunaUnificado + medicion 
+  | tasa_migracion ~ VI_Migrantes,
+  data = datos_par,
+  cluster = ~comuna
+)
+
+F_KP<-fitstat(modelo, type = "ivwald")
+f_kp<-F_KP$`ivwald1::tasa_migracion`$stat
+
 
 #Efecto inducido
 modelo <- feols(
@@ -617,6 +628,7 @@ modelo <- feols(
 primera_etapa<-fitstat(modelo, type = "ivf1")
 f<-primera_etapa$`ivf1::tasa_migracion`[1]                                     
 f<-as.numeric(f)
+
 #Segunda ventana de tiempo
 datos_par <- data_modelo %>%
   filter(medicion %in% c(as.character(2016), as.character(2019)))
@@ -629,6 +641,9 @@ modelo <- feols(
   data = datos_par,
   cluster = ~comuna
 )
+
+F_KP<-fitstat(modelo, type = "ivwald")
+f_kp<-F_KP$`ivwald1::tasa_migracion`$stat
 
 #Efecto inducido
 modelo <- feols(
