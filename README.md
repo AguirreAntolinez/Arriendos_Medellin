@@ -5,4 +5,4 @@ Para preguntas o comentarios, por favor contactar al autor al correo alexander.a
 
 This repository contains the files that allow for the reproduction of the results from the research paper titled _Effect of Migration on Housing Rental Price in the Neighborhoods of Medellin_, which was submitted to obtain a master's degree in Economics at the Universidad de Antioquia (September 2025).
 
-For questions or comments, please contact the author at alexander.aguirre@udea.edu.co
+For questions or comments, please contact the author at alexander.aguirre@udea.edu.co.
