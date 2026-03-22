@@ -82,6 +82,9 @@ download_data(wage = 2022,n_chunk = 2)
 #2023
 download_data(wage = 2023,n_chunk = 2)
 
+#2024
+download_data(wage = 2024,n_chunk = 1)
+
 object_names <- ls()
 df_names <- object_names[sapply(object_names, function(x) is.data.frame(get(x)))]
 ECV <- lapply(df_names, get)
