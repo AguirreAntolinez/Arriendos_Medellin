@@ -83,7 +83,7 @@ download_data(wage = 2022,n_chunk = 2)
 download_data(wage = 2023,n_chunk = 2)
 
 #2024
-download_data(wage = 2023,n_chunk = 2)
+download_data(wage = 2024,n_chunk = 2)
 
 
 object_names <- ls()
