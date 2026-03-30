@@ -5,16 +5,16 @@ library(tidyverse)
 options(timeout = 120)
 
 data_consolidada<-list() 
-  
+
 chunks <- sprintf("%03d", 1:11)
-  
+
 for (i in chunks){
   #Poner la ruta base del repositorio 
-  ruta<-paste0("https://github.com/AguirreAntolinez/Arriendos_Medellin/tree/main/Datos/ECV/Data_Consolidada/Ejercicio%20comunas/data_consolidada_",i,".csv")
+  ruta<-paste0("https://raw.githubusercontent.com/AguirreAntolinez/Arriendos_Medellin/refs/heads/main/Datos/ECV/Data_Consolidada/Ejercicio%20comunas/data_consolidada_",i,".csv")
   #Descargar los chunk y añadirles la medición  
   data_consolidada[[i]]<-read.csv2(ruta,header = TRUE,sep = ",") %>%
     mutate(across(everything(), as.character))
-  }
+}
 
 #Unir los chunks
 data_consolidada<-bind_rows(data_consolidada)
